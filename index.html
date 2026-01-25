@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Omerta War Planner - Giriş</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 { color: #0f172a; margin-bottom: 10px; font-size: 24px; }
+        p { color: #64748b; margin-bottom: 24px; font-size: 14px; }
+        .logo { font-size: 48px; margin-bottom: 16px; }
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            color: #475569;
+            font-size: 13px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #2563eb;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37,99,235,0.4);
+        }
+        .error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+        .error.show { display: block; }
+        .footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        @media (max-width: 480px) {
+            .login-box { padding: 30px 20px; margin: 10px; }
+            h1 { font-size: 20px; }
+            .logo { font-size: 40px; }
+            .form-group input { padding: 10px 12px; font-size: 14px; }
+            button { padding: 12px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="logo">⚔️</div>
+        <h1>Omerta War Planner</h1>
+        <p>Bu sayfa sadece yetkili kullanıcılar içindir</p>
+        
+        <form id="login-form" onsubmit="return handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı</label>
+                <input type="text" id="username" name="username" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit">Giriş Yap ⚔️</button>
+        </form>
+        
+        <p id="error-msg" class="error">Kullanıcı adı veya şifre hatalı!</p>
+        
+        <div class="footer">
+            Erişim sorunu için yönetici ile iletişime geçin
+        </div>
+    </div>
+
+    <script>
+        // Kullanıcılar - Şifreler SHA-512 hash ile saklanıyor
+        // Yeni kullanıcı eklemek için: console'da getHash('şifre') çalıştır ve hash'i buraya ekle
+        const USERS = {
+            'admin': 'd2d97ac398aba27058f0be8f498f38a5c6b5dfd692884cfb0fcc20ba4e4168231c1edd2ae61fb1aab734ad1f354699aaf0856a6ddc25575f4be62f6326c52d72', // bloodwar
+            'serdar': 'd2d97ac398aba27058f0be8f498f38a5c6b5dfd692884cfb0fcc20ba4e4168231c1edd2ae61fb1aab734ad1f354699aaf0856a6ddc25575f4be62f6326c52d72', // bloodwar
+            // Yeni kullanıcı ekle: 'kullanici_adi': 'hash_degeri'
+        };
+        
+        // Giriş geçmişi (localStorage'da tutulur)
+        function logLogin(username) {
+            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
+            history.push({
+                username: username,
+                time: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            });
+            // Son 100 girişi tut
+            if (history.length > 100) history.shift();
+            localStorage.setItem('omerta_login_history', JSON.stringify(history));
+        }
+        
+        // SHA-512 hash fonksiyonu
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            
+            errorMsg.classList.remove('show');
+            
+            // Hash'i kontrol et
+            const hashedPassword = await hashPassword(password);
+            
+            if (USERS[username] && USERS[username] === hashedPassword) {
+                // Giriş başarılı
+                logLogin(username);
+                
+                sessionStorage.setItem('omerta_user', JSON.stringify({
+                    username: username,
+                    loginTime: new Date().toISOString()
+                }));
+                
+                window.location.href = 'matchings_latest.html';
+            } else {
+                // Giriş başarısız
+                errorMsg.classList.add('show');
+                document.getElementById('password').value = '';
+            }
+            
+            return false;
+        }
+        
+        // Zaten giriş yapmışsa direkt yönlendir
+        if (sessionStorage.getItem('omerta_user')) {
+            window.location.href = 'matchings_latest.html';
+        }
+        
+        // Admin için: Giriş geçmişini görmek için console'da showLoginHistory() çalıştır
+        window.showLoginHistory = function() {
+            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
+            console.table(history);
+            return history;
+        };
+        
+        // Admin için: Yeni şifre hash'lemek için console'da getHash('şifre') çalıştır  
+        window.getHash = async function(password) {
+            const hash = await hashPassword(password);
+            console.log('Şifre:', password);
+            console.log('Hash:', hash);
+            return hash;
+        };
+    </script>
+</body>
+</html>

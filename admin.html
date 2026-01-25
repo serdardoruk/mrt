@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Omerta Admin Panel</title>
+    <script>
+        // Admin kontrolü
+        const user = sessionStorage.getItem('omerta_user');
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            const userData = JSON.parse(user);
+            if (userData.username !== 'admin' && userData.username !== 'serdar') {
+                alert('Bu sayfaya sadece admin erişebilir!');
+                window.location.href = 'matchings_latest.html';
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f6f8fc, #eef2f7);
+            min-height: 100vh;
+            padding: 20px;
+            margin-left: 70px !important;
+        }
+        
+        .side-nav { 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: 60px; 
+            height: 100vh; 
+            background: #0f172a; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 20px; 
+            gap: 10px; 
+            z-index: 9999; 
+        }
+        .side-nav a { 
+            width: 44px; 
+            height: 44px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 12px; 
+            background: #1e293b; 
+            color: #94a3b8; 
+            text-decoration: none; 
+            font-size: 18px; 
+            transition: all 0.2s; 
+        }
+        .side-nav a:hover { background: #334155; color: #fff; }
+        .side-nav a.active { background: #f59e0b; color: #fff; }
+        .side-nav a span { font-size: 20px; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #0f172a; margin-bottom: 24px; text-align: center; }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .section h2 {
+            color: #0f172a;
+            margin-bottom: 16px;
+            font-size: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .add-user-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        button:hover { transform: translateY(-1px); }
+        
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+        
+        .user-code {
+            background: #0f172a;
+            color: #22c55e;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 12px;
+        }
+        
+        .info-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-admin { background: #fef3c7; color: #92400e; }
+        .badge-user { background: #e0e7ff; color: #3730a3; }
+        
+        @media (max-width: 768px) {
+            body { margin-left: 0 !important; padding: 10px; padding-bottom: 80px; }
+            .side-nav { left: 0; top: auto; bottom: 0; width: 100%; height: 60px; flex-direction: row; justify-content: space-around; padding: 8px 0; gap: 0; }
+            .side-nav a { width: 50px; height: 44px; }
+            .container { padding: 0; }
+            h1 { font-size: 20px; margin-bottom: 16px; }
+            .section { padding: 14px; margin-bottom: 14px; }
+            .section h2 { font-size: 16px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px 6px; }
+            .add-user-form { flex-direction: column; }
+            .form-group { min-width: 100%; }
+            .user-code { font-size: 10px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="side-nav">
+        <a href="matchings_latest.html" title="Savaş Planı"><span>⚔</span></a>
+        <a href="family_roster_latest.html" title="Aile Listesi"><span>👥</span></a>
+        <a href="admin.html" class="active" title="Admin Panel"><span>⚙️</span></a>
+        <a href="#" onclick="sessionStorage.removeItem('omerta_user');window.location.href='index.html';return false;" title="Çıkış" style="margin-top:auto;margin-bottom:20px;background:#dc2626;"><span>🚪</span></a>
+    </nav>
+    
+    <div class="container">
+        <h1>⚙️ Admin Panel</h1>
+        
+        <!-- Giriş Geçmişi -->
+        <div class="section">
+            <h2>📊 Son Giriş Yapanlar</h2>
+            <div class="info-box">
+                Burada son 100 giriş kaydı görüntülenir. Veriler tarayıcının localStorage'ında tutulur.
+            </div>
+            <table id="login-history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kullanıcı</th>
+                        <th>Tarih / Saat</th>
+                        <th>Tarayıcı</th>
+                    </tr>
+                </thead>
+                <tbody id="login-history-body">
+                </tbody>
+            </table>
+            <br>
+            <button class="btn-danger" onclick="clearHistory()">Geçmişi Temizle</button>
+        </div>
+        
+        <!-- Yeni Kullanıcı Ekleme -->
+        <div class="section">
+            <h2>👤 Yeni Kullanıcı Ekle</h2>
+            <div class="info-box">
+                Yeni kullanıcı eklemek için aşağıdaki formu doldurun. Oluşturulan hash kodunu index.html dosyasındaki USERS objesine ekleyin.
+            </div>
+            
+            <div class="add-user-form">
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" id="new-username" placeholder="ornek: ahmet">
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="new-password" placeholder="Güçlü bir şifre girin">
+                </div>
+                <button class="btn-primary" onclick="generateUserCode()">Hash Oluştur</button>
+            </div>
+            
+            <div id="user-code-output" class="user-code" style="display:none;"></div>
+        </div>
+        
+        <!-- Mevcut Kullanıcılar Bilgisi -->
+        <div class="section">
+            <h2>📋 Mevcut Kullanıcılar</h2>
+            <div class="info-box">
+                Kullanıcılar index.html dosyasındaki USERS objesinde tanımlıdır. Değişiklik yapmak için o dosyayı düzenlemeniz gerekir.
+            </div>
+            <p style="margin-top:12px;color:#64748b;font-size:14px;">
+                Kullanıcı listesi index.html dosyasından okunabilir. Bu panel sadece hash oluşturma ve giriş geçmişi görüntüleme içindir.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // SHA-512 hash fonksiyonu
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        // Giriş geçmişini yükle
+        function loadLoginHistory() {
+            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
+            const tbody = document.getElementById('login-history-body');
+            tbody.innerHTML = '';
+            
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;">Henüz giriş kaydı yok</td></tr>';
+                return;
+            }
+            
+            // En son girişler üstte
+            history.reverse().forEach((entry, index) => {
+                const date = new Date(entry.time);
+                const formattedDate = date.toLocaleString('tr-TR');
+                
+                // User agent'ı kısalt
+                let browser = 'Bilinmiyor';
+                if (entry.userAgent) {
+                    if (entry.userAgent.includes('Chrome')) browser = 'Chrome';
+                    else if (entry.userAgent.includes('Firefox')) browser = 'Firefox';
+                    else if (entry.userAgent.includes('Safari')) browser = 'Safari';
+                    else if (entry.userAgent.includes('Edge')) browser = 'Edge';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${history.length - index}</td>
+                    <td><strong>${entry.username}</strong></td>
+                    <td>${formattedDate}</td>
+                    <td>${browser}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Geçmişi temizle
+        function clearHistory() {
+            if (confirm('Tüm giriş geçmişi silinecek. Emin misiniz?')) {
+                localStorage.removeItem('omerta_login_history');
+                loadLoginHistory();
+            }
+        }
+        
+        // Kullanıcı kodu oluştur
+        async function generateUserCode() {
+            const username = document.getElementById('new-username').value.trim().toLowerCase();
+            const password = document.getElementById('new-password').value;
+            const output = document.getElementById('user-code-output');
+            
+            if (!username || !password) {
+                alert('Kullanıcı adı ve şifre gerekli!');
+                return;
+            }
+            
+            const hash = await hashPassword(password);
+            
+            const code = `// index.html dosyasındaki USERS objesine ekleyin:
+'${username}': '${hash}',
+
+// Örnek:
+const USERS = {
+    'admin': '...mevcut hash...',
+    'serdar': '...mevcut hash...',
+    '${username}': '${hash}', // ← YENİ KULLANICI
+};`;
+            
+            output.textContent = code;
+            output.style.display = 'block';
+        }
+        
+        // Sayfa yüklendiğinde
+        loadLoginHistory();
+    </script>
+</body>
+</html>
