@@ -142,15 +142,30 @@
         async function logLogin(username) {
             // Konum bilgisi al (IP bazlı)
             let location = 'Bilinmiyor';
-            try {
-                // ipinfo.io kullan (HTTPS + CORS destekli, günde 50k istek ücretsiz)
-                const geoRes = await fetch('https://ipinfo.io/json?token=demo');
-                const geoData = await geoRes.json();
-                if (geoData.city && geoData.country) {
-                    location = `${geoData.city}, ${geoData.country}`;
+            
+            // Birden fazla API dene
+            const geoApis = [
+                { url: 'https://ipwho.is/', getLocation: d => d.city && d.country ? `${d.city}, ${d.country}` : null },
+                { url: 'https://ipapi.co/json/', getLocation: d => d.city && d.country_name ? `${d.city}, ${d.country_name}` : null },
+                { url: 'https://freeipapi.com/api/json/', getLocation: d => d.cityName && d.countryName ? `${d.cityName}, ${d.countryName}` : null }
+            ];
+            
+            for (const api of geoApis) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    const res = await fetch(api.url, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    const data = await res.json();
+                    const loc = api.getLocation(data);
+                    if (loc) {
+                        location = loc;
+                        console.log('[logLogin] Location from', api.url, ':', location);
+                        break;
+                    }
+                } catch (e) {
+                    console.warn('[logLogin] API failed:', api.url, e.message);
                 }
-            } catch (e) {
-                console.error('[logLogin] Geo error:', e);
             }
             
             const loginData = {
