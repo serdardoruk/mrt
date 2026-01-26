@@ -195,8 +195,8 @@
             const hashedPassword = await hashPassword(password);
             
             if (USERS[username] && USERS[username] === hashedPassword) {
-                // Giriş başarılı
-                logLogin(username);
+                // Giriş başarılı - önce logla, sonra yönlendir
+                await logLogin(username);
                 
                 sessionStorage.setItem('omerta_user', JSON.stringify({
                     username: username,
