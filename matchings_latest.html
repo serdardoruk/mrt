@@ -16,12 +16,13 @@ button { background: #2563eb; color: #f8fafc; border: none; padding: 6px 10px; b
 button:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(37,99,235,0.35); }
 .icon-btn { padding: 2px 6px; min-width: 0; font-size: 12px; line-height: 1; background: #f8fafc; color: #0f172a; border: 1px solid #cbd5e1; box-shadow: none; }
 .icon-btn:hover { transform: none; box-shadow: none; background: #e5ecf5; }
-.side-nav { position: fixed; left: 0; top: 0; width: 60px; height: 100vh; background: #0f172a; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 10px; z-index: 9999; }
-.side-nav a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #1e293b; color: #94a3b8; text-decoration: none; font-size: 18px; transition: all 0.2s; }
+.side-nav { position: fixed; left: 0; top: 0; width: 120px; height: 100vh; background: #0f172a; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 10px; z-index: 9999; }
+.side-nav a { width: 100px; height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 12px; background: #1e293b; color: #94a3b8; text-decoration: none; font-size: 18px; transition: all 0.2s; }
 .side-nav a:hover { background: #334155; color: #fff; }
 .side-nav a.active { background: #e94560; color: #fff; }
 .side-nav a span { font-size: 20px; }
-body { margin-left: 70px !important; }
+.side-nav .nav-label { display: block; font-size: 11px; margin-top: 2px; }
+body { margin-left: 130px !important; }
 .nav-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 .nav-btn { text-decoration: none; background: #0f172a; color: #f8fafc; padding: 7px 12px; border-radius: 8px; font-weight: 800; box-shadow: 0 6px 14px rgba(0,0,0,0.14); border: 1px solid #1f2937; }
 .nav-btn:hover { background: #111827; }
@@ -162,7 +163,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
 <h2 style="margin-bottom:6px;">Savaş Planı</h2>
-<div class='update-time'>🕐 Güncelleme: 26.01.2026 00:55 OT</div>
+<div class='update-time'>🕐 Güncelleme: 26.01.2026 00:58 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
