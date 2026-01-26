@@ -11,7 +11,7 @@
             window.location.href = 'index.html';
         } else {
             const userData = JSON.parse(user);
-            if (userData.username !== 'admin' && userData.username !== 'serdar') {
+            if (userData.username !== 'admin') {
                 alert('Bu sayfaya sadece admin erişebilir!');
                 window.location.href = 'matchings_latest.html';
             }
