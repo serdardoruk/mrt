@@ -140,21 +140,14 @@
         
         // Giriş geçmişi (Firebase'e kaydedilir)
         async function logLogin(username) {
-            // Konum bilgisi al (IP bazlı) - birden fazla API dene
+            // Konum bilgisi al (IP bazlı)
             let location = 'Bilinmiyor';
             try {
-                // Önce ip-api.com dene (CORS destekli)
-                let geoRes = await fetch('http://ip-api.com/json/?fields=city,country');
-                let geoData = await geoRes.json();
+                // ipinfo.io kullan (HTTPS + CORS destekli, günde 50k istek ücretsiz)
+                const geoRes = await fetch('https://ipinfo.io/json?token=demo');
+                const geoData = await geoRes.json();
                 if (geoData.city && geoData.country) {
                     location = `${geoData.city}, ${geoData.country}`;
-                } else {
-                    // Yedek: ipapi.co
-                    geoRes = await fetch('https://ipapi.co/json/');
-                    geoData = await geoRes.json();
-                    if (geoData.city && geoData.country_name) {
-                        location = `${geoData.city}, ${geoData.country_name}`;
-                    }
                 }
             } catch (e) {
                 console.error('[logLogin] Geo error:', e);
