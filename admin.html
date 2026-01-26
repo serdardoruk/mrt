@@ -314,7 +314,8 @@
                     // User agent'ı kısalt
                     let browser = 'Bilinmiyor';
                     if (entry.userAgent) {
-                        if (entry.userAgent.includes('Edg')) browser = '🌐 Edge';
+                        if (entry.userAgent.includes('CriOS')) browser = '🌐 Chrome iOS';
+                        else if (entry.userAgent.includes('Edg')) browser = '🌐 Edge';
                         else if (entry.userAgent.includes('Chrome')) browser = '🌐 Chrome';
                         else if (entry.userAgent.includes('Firefox')) browser = '🦊 Firefox';
                         else if (entry.userAgent.includes('Safari')) browser = '🧭 Safari';
