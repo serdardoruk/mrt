@@ -230,7 +230,7 @@
         <div class="section">
             <h2>👤 Yeni Kullanıcı Ekle</h2>
             <div class="info-box">
-                Yeni kullanıcı eklemek için aşağıdaki formu doldurun. Oluşturulan hash kodunu index.html dosyasındaki USERS objesine ekleyin.
+                🔥 Kullanıcılar Firebase'de tutulur. Buradan ekleyince hemen aktif olur!
             </div>
             
             <div class="add-user-form">
@@ -242,21 +242,28 @@
                     <label>Şifre</label>
                     <input type="password" id="new-password" placeholder="Güçlü bir şifre girin">
                 </div>
-                <button class="btn-primary" onclick="generateUserCode()">Hash Oluştur</button>
+                <button class="btn-primary" onclick="addUser()">➕ Kullanıcı Ekle</button>
             </div>
-            
-            <div id="user-code-output" class="user-code" style="display:none;"></div>
+            <div id="add-user-status" style="margin-top:12px;display:none;"></div>
         </div>
         
-        <!-- Mevcut Kullanıcılar Bilgisi -->
+        <!-- Mevcut Kullanıcılar -->
         <div class="section">
             <h2>📋 Mevcut Kullanıcılar</h2>
-            <div class="info-box">
-                Kullanıcılar index.html dosyasındaki USERS objesinde tanımlıdır. Değişiklik yapmak için o dosyayı düzenlemeniz gerekir.
+            <div style="margin-bottom:12px;">
+                <button class="btn-secondary" onclick="loadUsers()">🔄 Yenile</button>
             </div>
-            <p style="margin-top:12px;color:#64748b;font-size:14px;">
-                Kullanıcı listesi index.html dosyasından okunabilir. Bu panel sadece hash oluşturma ve giriş geçmişi görüntüleme içindir.
-            </p>
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kullanıcı Adı</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="users-body">
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -349,35 +356,122 @@
             }
         }
         
-        // Kullanıcı kodu oluştur
-        async function generateUserCode() {
+        // Kullanıcıları Firebase'den yükle
+        async function loadUsers() {
+            const tbody = document.getElementById('users-body');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;">Yükleniyor...</td></tr>';
+            
+            try {
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const data = await res.json();
+                
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;">Henüz kullanıcı yok</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                const users = Object.keys(data);
+                users.forEach((username, index) => {
+                    const row = document.createElement('tr');
+                    const isProtected = username === 'admin' || username === 'serdar';
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${username}</strong> ${isProtected ? '<span class="badge badge-admin">Korumalı</span>' : ''}</td>
+                        <td>${isProtected ? '-' : `<button class="btn-danger" onclick="deleteUser('${username}')" style="padding:4px 10px;font-size:12px;">🗑️ Sil</button>`}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error('[loadUsers] Firebase error:', e);
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
+            }
+        }
+        
+        // Yeni kullanıcı ekle
+        async function addUser() {
             const username = document.getElementById('new-username').value.trim().toLowerCase();
             const password = document.getElementById('new-password').value;
-            const output = document.getElementById('user-code-output');
+            const status = document.getElementById('add-user-status');
             
             if (!username || !password) {
                 alert('Kullanıcı adı ve şifre gerekli!');
                 return;
             }
             
+            if (password.length < 4) {
+                alert('Şifre en az 4 karakter olmalı!');
+                return;
+            }
+            
             const hash = await hashPassword(password);
             
-            const code = `// index.html dosyasındaki USERS objesine ekleyin:
-'${username}': '${hash}',
-
-// Örnek:
-const USERS = {
-    'admin': '...mevcut hash...',
-    'serdar': '...mevcut hash...',
-    '${username}': '${hash}', // ← YENİ KULLANICI
-};`;
+            try {
+                // Mevcut kullanıcıları çek
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const users = await res.json() || {};
+                
+                if (users[username]) {
+                    alert('Bu kullanıcı adı zaten mevcut!');
+                    return;
+                }
+                
+                // Yeni kullanıcıyı ekle
+                users[username] = hash;
+                
+                await fetch(`${FIREBASE_URL}/users.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(users)
+                });
+                
+                status.innerHTML = '<span style="color:#16a34a;">✅ Kullanıcı eklendi: ' + username + '</span>';
+                status.style.display = 'block';
+                
+                document.getElementById('new-username').value = '';
+                document.getElementById('new-password').value = '';
+                
+                loadUsers();
+            } catch (e) {
+                console.error('[addUser] Firebase error:', e);
+                alert('Firebase kaydetme hatası!');
+            }
+        }
+        
+        // Kullanıcı sil
+        async function deleteUser(username) {
+            if (username === 'admin' || username === 'serdar') {
+                alert('Bu kullanıcı silinemez!');
+                return;
+            }
             
-            output.textContent = code;
-            output.style.display = 'block';
+            if (!confirm(`"${username}" kullanıcısı silinecek. Emin misiniz?`)) {
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const users = await res.json() || {};
+                
+                delete users[username];
+                
+                await fetch(`${FIREBASE_URL}/users.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(users)
+                });
+                
+                loadUsers();
+                alert('Kullanıcı silindi!');
+            } catch (e) {
+                console.error('[deleteUser] Firebase error:', e);
+                alert('Firebase silme hatası!');
+            }
         }
         
         // Sayfa yüklendiğinde
         loadLoginHistory();
+        loadUsers();
     </script>
 </body>
 </html>
