@@ -123,15 +123,35 @@
             // Yeni kullanıcı ekle: 'kullanici_adi': 'hash_degeri'
         };
         
-        // Giriş geçmişi (localStorage'da tutulur)
-        function logLogin(username) {
-            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
-            history.push({
+        // Firebase URL
+        const FIREBASE_URL = 'https://omerta-war-default-rtdb.firebaseio.com';
+        
+        // Giriş geçmişi (Firebase'e kaydedilir)
+        async function logLogin(username) {
+            const loginData = {
                 username: username,
                 time: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            });
-            // Son 100 girişi tut
+                userAgent: navigator.userAgent,
+                platform: navigator.platform || 'Unknown',
+                language: navigator.language || 'Unknown',
+                screenSize: `${screen.width}x${screen.height}`
+            };
+            
+            // Firebase'e kaydet
+            try {
+                await fetch(`${FIREBASE_URL}/loginHistory.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+                console.log('[logLogin] Saved to Firebase');
+            } catch (e) {
+                console.error('[logLogin] Firebase error:', e);
+            }
+            
+            // localStorage'a da yedekle
+            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
+            history.push(loginData);
             if (history.length > 100) history.shift();
             localStorage.setItem('omerta_login_history', JSON.stringify(history));
         }

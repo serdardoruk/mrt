@@ -202,7 +202,11 @@
         <div class="section">
             <h2>📊 Son Giriş Yapanlar</h2>
             <div class="info-box">
-                Burada son 100 giriş kaydı görüntülenir. Veriler tarayıcının localStorage'ında tutulur.
+                🔥 Tüm cihazlardan yapılan girişler Firebase'den yükleniyor.
+            </div>
+            <div style="margin-bottom:12px;">
+                <button class="btn-secondary" onclick="loadLoginHistory()" style="margin-right:8px;">🔄 Yenile</button>
+                <span id="login-count" style="color:#64748b;font-size:13px;"></span>
             </div>
             <table id="login-history-table">
                 <thead>
@@ -211,13 +215,15 @@
                         <th>Kullanıcı</th>
                         <th>Tarih / Saat</th>
                         <th>Tarayıcı</th>
+                        <th>Platform</th>
+                        <th>Ekran</th>
                     </tr>
                 </thead>
                 <tbody id="login-history-body">
                 </tbody>
             </table>
             <br>
-            <button class="btn-danger" onclick="clearHistory()">Geçmişi Temizle</button>
+            <button class="btn-danger" onclick="clearHistory()">🗑️ Firebase Geçmişini Temizle</button>
         </div>
         
         <!-- Yeni Kullanıcı Ekleme -->
@@ -264,47 +270,82 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
-        // Giriş geçmişini yükle
-        function loadLoginHistory() {
-            const history = JSON.parse(localStorage.getItem('omerta_login_history') || '[]');
+        // Firebase URL
+        const FIREBASE_URL = 'https://omerta-war-default-rtdb.firebaseio.com';
+        
+        // Giriş geçmişini Firebase'den yükle
+        async function loadLoginHistory() {
             const tbody = document.getElementById('login-history-body');
-            tbody.innerHTML = '';
+            const countSpan = document.getElementById('login-count');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Yükleniyor...</td></tr>';
             
-            if (history.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;">Henüz giriş kaydı yok</td></tr>';
-                return;
-            }
-            
-            // En son girişler üstte
-            history.reverse().forEach((entry, index) => {
-                const date = new Date(entry.time);
-                const formattedDate = date.toLocaleString('tr-TR');
+            try {
+                const res = await fetch(`${FIREBASE_URL}/loginHistory.json`);
+                const data = await res.json();
                 
-                // User agent'ı kısalt
-                let browser = 'Bilinmiyor';
-                if (entry.userAgent) {
-                    if (entry.userAgent.includes('Chrome')) browser = 'Chrome';
-                    else if (entry.userAgent.includes('Firefox')) browser = 'Firefox';
-                    else if (entry.userAgent.includes('Safari')) browser = 'Safari';
-                    else if (entry.userAgent.includes('Edge')) browser = 'Edge';
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Henüz giriş kaydı yok</td></tr>';
+                    countSpan.textContent = '';
+                    return;
                 }
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${history.length - index}</td>
-                    <td><strong>${entry.username}</strong></td>
-                    <td>${formattedDate}</td>
-                    <td>${browser}</td>
-                `;
-                tbody.appendChild(row);
-            });
+                // Firebase object'i array'e çevir ve tarihe göre sırala
+                const history = Object.entries(data).map(([id, entry]) => ({ id, ...entry }));
+                history.sort((a, b) => new Date(b.time) - new Date(a.time));
+                
+                countSpan.textContent = `Toplam ${history.length} giriş kaydı`;
+                tbody.innerHTML = '';
+                
+                // Son 100 girişi göster
+                history.slice(0, 100).forEach((entry, index) => {
+                    const date = new Date(entry.time);
+                    const formattedDate = date.toLocaleString('tr-TR');
+                    
+                    // User agent'ı kısalt
+                    let browser = 'Bilinmiyor';
+                    if (entry.userAgent) {
+                        if (entry.userAgent.includes('Edg')) browser = '🌐 Edge';
+                        else if (entry.userAgent.includes('Chrome')) browser = '🌐 Chrome';
+                        else if (entry.userAgent.includes('Firefox')) browser = '🦊 Firefox';
+                        else if (entry.userAgent.includes('Safari')) browser = '🧭 Safari';
+                    }
+                    
+                    // Platform kısalt
+                    let platform = entry.platform || '-';
+                    if (platform.includes('Mac')) platform = '🍎 Mac';
+                    else if (platform.includes('Win')) platform = '🪟 Windows';
+                    else if (platform.includes('Linux')) platform = '🐧 Linux';
+                    else if (platform.includes('iPhone')) platform = '📱 iPhone';
+                    else if (platform.includes('Android')) platform = '📱 Android';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${entry.username}</strong></td>
+                        <td>${formattedDate}</td>
+                        <td>${browser}</td>
+                        <td>${platform}</td>
+                        <td>${entry.screenSize || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error('[loadLoginHistory] Firebase error:', e);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
+            }
         }
         
-        // Geçmişi temizle
-        function clearHistory() {
-            if (confirm('Tüm giriş geçmişi silinecek. Emin misiniz?')) {
-                localStorage.removeItem('omerta_login_history');
-                loadLoginHistory();
+        // Firebase geçmişini temizle
+        async function clearHistory() {
+            if (confirm('⚠️ TÜM giriş geçmişi Firebase\'den silinecek. Emin misiniz?')) {
+                try {
+                    await fetch(`${FIREBASE_URL}/loginHistory.json`, { method: 'DELETE' });
+                    loadLoginHistory();
+                    alert('Geçmiş temizlendi!');
+                } catch (e) {
+                    console.error('[clearHistory] Firebase error:', e);
+                    alert('Firebase silme hatası!');
+                }
             }
         }
         
