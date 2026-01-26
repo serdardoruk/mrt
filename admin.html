@@ -209,24 +209,25 @@
             </div>
             <div style="margin-bottom:12px;">
                 <button class="btn-secondary" onclick="loadLoginHistory()" style="margin-right:8px;">🔄 Yenile</button>
-                <span id="login-count" style="color:#64748b;font-size:13px;"></span>
+                <button class="btn-danger" onclick="deleteSelected()" style="margin-right:8px;">🗑️ Seçilenleri Sil</button>
+                <button class="btn-danger" onclick="clearHistory()">🗑️ Tümünü Sil</button>
+                <span id="login-count" style="color:#64748b;font-size:13px;margin-left:12px;"></span>
             </div>
             <table id="login-history-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
                         <th>Kullanıcı</th>
                         <th>Tarih / Saat</th>
                         <th>Konum</th>
                         <th>Tarayıcı</th>
                         <th>Platform</th>
+                        <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody id="login-history-body">
                 </tbody>
             </table>
-            <br>
-            <button class="btn-danger" onclick="clearHistory()">🗑️ Firebase Geçmişini Temizle</button>
         </div>
         
         <!-- Yeni Kullanıcı Ekleme -->
@@ -331,18 +332,19 @@
                     
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${index + 1}</td>
+                        <td><input type="checkbox" class="log-checkbox" data-id="${entry.id}"></td>
                         <td><strong>${entry.username}</strong></td>
                         <td>${formattedDate}</td>
                         <td>📍 ${entry.location || 'Bilinmiyor'}</td>
                         <td>${browser}</td>
                         <td>${platform}</td>
+                        <td><button class="btn-danger" onclick="deleteLog('${entry.id}')" style="padding:2px 8px;font-size:11px;">✖</button></td>
                     `;
                     tbody.appendChild(row);
                 });
             } catch (e) {
                 console.error('[loadLoginHistory] Firebase error:', e);
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
             }
         }
         
@@ -358,6 +360,47 @@
                     alert('Firebase silme hatası!');
                 }
             }
+        }
+        
+        // Tek log sil
+        async function deleteLog(id) {
+            try {
+                await fetch(`${FIREBASE_URL}/loginHistory/${id}.json`, { method: 'DELETE' });
+                loadLoginHistory();
+            } catch (e) {
+                console.error('[deleteLog] Firebase error:', e);
+                alert('Silme hatası!');
+            }
+        }
+        
+        // Seçilenleri sil
+        async function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.log-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Silmek için kayıt seçin!');
+                return;
+            }
+            
+            if (!confirm(`${checkboxes.length} kayıt silinecek. Emin misiniz?`)) {
+                return;
+            }
+            
+            try {
+                for (const cb of checkboxes) {
+                    await fetch(`${FIREBASE_URL}/loginHistory/${cb.dataset.id}.json`, { method: 'DELETE' });
+                }
+                loadLoginHistory();
+            } catch (e) {
+                console.error('[deleteSelected] Firebase error:', e);
+                alert('Silme hatası!');
+            }
+        }
+        
+        // Tümünü seç/kaldır
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.log-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
         }
         
         // Kullanıcıları Firebase'den yükle
