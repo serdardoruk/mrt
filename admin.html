@@ -377,7 +377,7 @@
                 const users = Object.keys(data);
                 users.forEach((username, index) => {
                     const row = document.createElement('tr');
-                    const isProtected = username === 'admin' || username === 'serdar';
+                    const isProtected = username === 'admin';
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td><strong>${username}</strong> ${isProtected ? '<span class="badge badge-admin">Korumalı</span>' : ''}</td>
@@ -443,7 +443,7 @@
         
         // Kullanıcı sil
         async function deleteUser(username) {
-            if (username === 'admin' || username === 'serdar') {
+            if (username === 'admin') {
                 alert('Bu kullanıcı silinemez!');
                 return;
             }
