@@ -217,9 +217,9 @@
                         <th>#</th>
                         <th>Kullanıcı</th>
                         <th>Tarih / Saat</th>
+                        <th>Konum</th>
                         <th>Tarayıcı</th>
                         <th>Platform</th>
-                        <th>Ekran</th>
                     </tr>
                 </thead>
                 <tbody id="login-history-body">
@@ -334,9 +334,9 @@
                         <td>${index + 1}</td>
                         <td><strong>${entry.username}</strong></td>
                         <td>${formattedDate}</td>
+                        <td>📍 ${entry.location || 'Bilinmiyor'}</td>
                         <td>${browser}</td>
                         <td>${platform}</td>
-                        <td>${entry.screenSize || '-'}</td>
                     `;
                     tbody.appendChild(row);
                 });

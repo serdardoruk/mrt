@@ -140,13 +140,26 @@
         
         // Giriş geçmişi (Firebase'e kaydedilir)
         async function logLogin(username) {
+            // Konum bilgisi al (IP bazlı)
+            let location = 'Bilinmiyor';
+            try {
+                const geoRes = await fetch('https://ipapi.co/json/');
+                const geoData = await geoRes.json();
+                if (geoData.city && geoData.country_name) {
+                    location = `${geoData.city}, ${geoData.country_name}`;
+                }
+            } catch (e) {
+                console.error('[logLogin] Geo error:', e);
+            }
+            
             const loginData = {
                 username: username,
                 time: new Date().toISOString(),
                 userAgent: navigator.userAgent,
                 platform: navigator.platform || 'Unknown',
                 language: navigator.language || 'Unknown',
-                screenSize: `${screen.width}x${screen.height}`
+                screenSize: `${screen.width}x${screen.height}`,
+                location: location
             };
             
             // Firebase'e kaydet
