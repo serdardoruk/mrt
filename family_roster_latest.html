@@ -50,7 +50,8 @@ body { margin-top: 60px !important; }
 .update-time { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 8px; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; display: inline-block; }
 @media (max-width: 768px) { .top-nav { top: auto; bottom: 0; height: 60px; } .page { margin-bottom: 70px; padding: 12px; } }
 </style></head><body>
-<nav class='top-nav'><a href='matchings_latest.html'><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='family_roster_latest.html' class='active'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
+<nav class='top-nav'><a href='matchings_latest.html'><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='family_roster_latest.html' class='active'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='admin.html' id='admin-link' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
+<script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin'||u.username==='serdar')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class='page'>
 <div class='nav-bar'>
   <a id='toggleAllBtn' class='nav-btn secondary' href='javascript:void(0)'>Tümünü Aç</a>
