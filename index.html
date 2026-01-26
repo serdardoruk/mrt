@@ -186,6 +186,11 @@
             
             errorMsg.classList.remove('show');
             
+            // Kullanıcılar henüz yüklenmediyse bekle
+            if (Object.keys(USERS).length === 0) {
+                await loadUsers();
+            }
+            
             // Hash'i kontrol et
             const hashedPassword = await hashPassword(password);
             
