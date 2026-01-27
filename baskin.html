@@ -1,4 +1,4 @@
-<html><head><meta charset='utf-8'><title>Savaş Planlayıcı</title>
+<html><head><meta charset='utf-8'><title>Baskın Planlayıcı</title>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
 <script>if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}</script>
 <style>
@@ -162,7 +162,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
-<nav class='top-nav'><a href='matchings_latest.html' class='active'><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='baskin.html' class=''><span>🎯</span><span class='nav-label'>Baskın</span></a><a href='family_roster_latest.html'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='admin.html' id='admin-link' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
+<nav class='top-nav'><a href='matchings_latest.html' class=''><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='baskin.html' class='active'><span>🎯</span><span class='nav-label'>Baskın</span></a><a href='family_roster_latest.html'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='admin.html' id='admin-link' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
@@ -469,7 +469,7 @@ input.default-target { width: 72px; margin-left: 6px; }
         };
     }
 
-    const STORAGE_KEY = 'omerta_war_state';
+    const STORAGE_KEY = 'omerta_baskin_state';
 
     function encodeState(obj) {
         try {
