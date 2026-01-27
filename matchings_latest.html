@@ -159,9 +159,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 .rank-item { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .rank-label { font-size: 12px; color: #475569; font-weight: 600; margin-right: 4px; }
 .update-time { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 8px; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; display: inline-block; }
-.pos-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; flex-shrink: 0; }
-.tier-legend { box-shadow: 0 0 6px rgba(245,158,11,0.6); }
-.pos-num { font-weight: 600; font-size: 12px; color: #374151; }
+.pos-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; min-width: 32px; text-align: center; }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
@@ -169,7 +167,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:36 OT</div>
+<div class='update-time'>🕐 27.01.2026 18:37 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -280,7 +278,9 @@ input.default-target { width: 72px; margin-left: 6px; }
         const n = Number(pos);
         if (isNaN(n) || n <= 0) return '';
         const tier = getPosTier(n);
-        return `<span class="pos-indicator tier-${tier.tierName}" style="background:${tier.color}"></span><span class="pos-num">#${n}</span>`;
+        const isLight = ['top100', 'top200', 'none'].includes(tier.tierName);
+        const textColor = isLight ? '#166534' : '#fff';
+        return `<span class="pos-badge" style="background:${tier.color};color:${textColor}">#${n}</span>`;
     }
 
     function fmtDisplay(rec, side = 'ally') {
