@@ -159,6 +159,14 @@ input.default-target { width: 72px; margin-left: 6px; }
 .rank-item { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .rank-label { font-size: 12px; color: #475569; font-weight: 600; margin-right: 4px; }
 .update-time { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 8px; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; display: inline-block; }
+.pos-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; min-width: 32px; text-align: center; }
+.pos-1 { background: #1B5E20; color: #fff; }
+.pos-2 { background: #2E7D32; color: #fff; }
+.pos-3 { background: #43A047; color: #fff; }
+.pos-4 { background: #66BB6A; color: #000; }
+.pos-5 { background: #A5D6A7; color: #000; }
+.pos-6 { background: #C8E6C9; color: #000; }
+.pos-7 { background: #E8F5E9; color: #000; }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
@@ -166,7 +174,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 17:49 OT</div>
+<div class='update-time'>🕐 27.01.2026 17:58 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -242,6 +250,18 @@ input.default-target { width: 72px; margin-left: 6px; }
         return '#e5e7eb';
     }
 
+    function getPosClass(pos) {
+        const n = Number(pos);
+        if (isNaN(n) || n <= 0) return 'pos-7';
+        if (n <= 5) return 'pos-1';
+        if (n <= 10) return 'pos-2';
+        if (n <= 20) return 'pos-3';
+        if (n <= 50) return 'pos-4';
+        if (n <= 100) return 'pos-5';
+        if (n <= 200) return 'pos-6';
+        return 'pos-7';
+    }
+
     function fmtDisplay(rec, side = 'ally') {
         const name = rec?.Name || '';
         const fam = rec?.Family || '';
@@ -249,7 +269,8 @@ input.default-target { width: 72px; margin-left: 6px; }
         const pos = rec?.Pos;
         const href = normHref(rec?.UserHref);
         const shieldHtml = shieldDot(rec);
-        const posStr = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? `#${Math.round(Number(pos))}` : '';
+        const posNum = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? Math.round(Number(pos)) : null;
+        const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
         const orderMap = new Map();
         (data.initialRankSelection || []).forEach((r, idx) => orderMap.set(r, idx));
         const rankTier = orderMap.has(rank) ? orderMap.get(rank) : 99;
@@ -257,7 +278,7 @@ input.default-target { width: 72px; margin-left: 6px; }
         const famColor = pickFamColor(fam, side);
 
         const metaBits = [];
-        if (posStr) metaBits.push(`<span class=\"meta\">${posStr}</span>`);
+        if (posHtml) metaBits.push(posHtml);
         if (fam) metaBits.push(`<span class=\"meta fam-meta\" style=\"color:${famColor}\">${fam}</span>`);
         if (rank) metaBits.push(`<span class=\"${rankCls}\">${rank}</span>`);
         const nameCore = `<span class=\"name-strong\">${name}</span>`;
@@ -1006,14 +1027,15 @@ input.default-target { width: 72px; margin-left: 6px; }
             .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
 
         const fmtRow = m => {
-            const posStr = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? ` #${Math.round(Number(m.Pos))}` : '';
+            const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
+            const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
             const rankStr = m.Rank ? ` ${m.Rank}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
-            return `<div class="bottom-line" title="${esc(titleFor(m))}">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posStr}${famStr}${rankStr}</span></div>`;
+            return `<div class="bottom-line" title="${esc(titleFor(m))}">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famStr}${rankStr}</span></div>`;
         };
 
         wrap.innerHTML = `
@@ -1190,14 +1212,15 @@ input.default-target { width: 72px; margin-left: 6px; }
             .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
 
         const fmtRow = m => {
-            const posStr = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? ` #${Math.round(Number(m.Pos))}` : '';
+            const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
+            const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
             const rankStr = m.Rank ? ` ${m.Rank}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
-            return `<div class="bottom-line">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posStr}${famStr}${rankStr}</span></div>`;
+            return `<div class="bottom-line">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famStr}${rankStr}</span></div>`;
         };
 
         wrap.innerHTML = `
