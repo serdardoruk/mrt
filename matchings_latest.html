@@ -159,11 +159,26 @@ input.default-target { width: 72px; margin-left: 6px; }
 .rank-item { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .rank-label { font-size: 12px; color: #475569; font-weight: 600; margin-right: 4px; }
 .update-time { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 8px; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; display: inline-block; }
-.pos-bar-wrap { display: inline-flex; align-items: center; gap: 6px; min-width: 70px; }
-.pos-bar-bg { display: inline-block; width: 50px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
-.pos-bar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.2s ease; }
+.pos-bar-wrap { display: inline-flex; align-items: center; gap: 4px; min-width: 70px; }
+.pos-icon { font-size: 10px; line-height: 1; }
+.tier-gold { font-size: 14px; }
+.tier-elite { color: #15803d; font-size: 8px; letter-spacing: -1px; }
+.tier-strong { color: #22c55e; font-size: 8px; letter-spacing: -1px; }
+.tier-mid { color: #86efac; font-size: 9px; letter-spacing: -1px; }
+.tier-low { color: #bbf7d0; font-size: 10px; }
+.tier-bottom { color: #9ca3af; font-size: 10px; }
+.pos-bar-bg { display: inline-block; width: 40px; height: 8px; border-radius: 4px; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+.pos-bg-gold { background: #fef3c7; }
+.pos-bg-elite { background: #dcfce7; }
+.pos-bg-strong { background: #d1fae5; }
+.pos-bg-mid { background: #ecfdf5; }
+.pos-bg-low { background: #f0fdf4; }
+.pos-bg-bottom { background: #f3f4f6; }
+.pos-bg-none { background: #f3f4f6; }
+.pos-bar-fill { display: block; height: 100%; border-radius: 3px; transition: width 0.2s ease; }
 .pos-num { font-weight: 700; font-size: 12px; color: #475569; min-width: 28px; }
-.pos-num-top { font-weight: 800; font-size: 13px; color: #15803d; min-width: 28px; }
+.pos-num-elite { font-weight: 800; font-size: 13px; color: #15803d; min-width: 28px; }
+.pos-num-gold { font-weight: 900; font-size: 14px; color: #b45309; min-width: 28px; text-shadow: 0 1px 1px rgba(0,0,0,0.1); }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
@@ -171,7 +186,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:12 OT</div>
+<div class='update-time'>🕐 27.01.2026 18:20 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -249,36 +264,46 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function getPosPercent(pos) {
         const n = Number(pos);
-        if (isNaN(n) || n <= 0) return 5;
+        if (isNaN(n) || n <= 0) return 10;
+        // #1 özel
         if (n === 1) return 100;
-        if (n <= 5) return 95 - (n - 2) * 8;
-        if (n <= 10) return 70 - (n - 5) * 6;
-        if (n <= 20) return 45 - (n - 10) * 2;
-        if (n <= 50) return 28 - (n - 20) * 0.4;
-        if (n <= 100) return 16 - (n - 50) * 0.12;
-        return 10;
+        // #2-5: tier içinde doluluk (2=100%, 5=25%)
+        if (n <= 5) return 100 - (n - 2) * 25;
+        // #6-20: tier içinde doluluk (6=100%, 20=~30%)
+        if (n <= 20) return 100 - (n - 6) * 5;
+        // #21-50: tier içinde doluluk (21=100%, 50=~35%)
+        if (n <= 50) return 100 - (n - 21) * 2.2;
+        // #51-100: tier içinde doluluk (51=100%, 100=~50%)
+        if (n <= 100) return 100 - (n - 51) * 1;
+        // #101-200: tier içinde doluluk (101=100%, 200=~50%)
+        if (n <= 200) return 100 - (n - 101) * 0.5;
+        // #200+
+        return 20;
     }
 
-    function getPosColor(pos) {
+    function getPosTier(pos) {
         const n = Number(pos);
-        if (isNaN(n) || n <= 0) return '#e5e7eb';
-        if (n === 1) return '#15803d';
-        if (n <= 3) return '#16a34a';
-        if (n <= 5) return '#22c55e';
-        if (n <= 10) return '#4ade80';
-        if (n <= 20) return '#86efac';
-        if (n <= 50) return '#bbf7d0';
-        return '#dcfce7';
+        if (isNaN(n) || n <= 0) return { color: '#e5e7eb', tierName: 'none', icon: '' };
+        if (n === 1) return { color: '#fbbf24', tierName: 'gold', icon: '🎖️' };       // Madalya
+        if (n <= 5) return { color: '#15803d', tierName: 'elite', icon: '★★★★' };    // 4 yıldız
+        if (n <= 20) return { color: '#22c55e', tierName: 'strong', icon: '★★★' };   // 3 yıldız
+        if (n <= 50) return { color: '#86efac', tierName: 'mid', icon: '★★' };        // 2 yıldız
+        if (n <= 100) return { color: '#bbf7d0', tierName: 'low', icon: '★' };        // 1 yıldız
+        if (n <= 200) return { color: '#d1d5db', tierName: 'bottom', icon: '☆' };     // Boş yıldız
+        return { color: '#e5e7eb', tierName: 'none', icon: '' };                      // 200+ boş
     }
 
     function posBarHtml(pos) {
         const n = Number(pos);
         if (isNaN(n) || n <= 0) return '';
         const pct = getPosPercent(n);
-        const color = getPosColor(n);
-        const isTop = n <= 5;
-        const numClass = isTop ? 'pos-num-top' : 'pos-num';
-        return `<span class="pos-bar-wrap"><span class="pos-bar-bg"><span class="pos-bar-fill" style="width:${pct}%;background:${color}"></span></span><span class="${numClass}">#${n}</span></span>`;
+        const tier = getPosTier(n);
+        const isGold = n === 1;
+        const isElite = n <= 5;
+        const numClass = isGold ? 'pos-num-gold' : (isElite ? 'pos-num-elite' : 'pos-num');
+        const bgClass = `pos-bg-${tier.tierName}`;
+        const iconHtml = tier.icon ? `<span class="pos-icon tier-${tier.tierName}">${tier.icon}</span>` : '';
+        return `<span class="pos-bar-wrap">${iconHtml}<span class="pos-bar-bg ${bgClass}"><span class="pos-bar-fill" style="width:${pct}%;background:${tier.color}"></span></span><span class="${numClass}">#${n}</span></span>`;
     }
 
     function fmtDisplay(rec, side = 'ally') {
