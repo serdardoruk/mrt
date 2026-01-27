@@ -147,7 +147,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 .shotter-link { display: inline-block; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 8px 24px rgba(124,58,237,0.35); transition: transform 0.1s, box-shadow 0.2s; }
 .shotter-link:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,0.45); }
 @media print { .controls { display: none; } body { margin: 10px; background: #fff; color: #000; } table { width: 100%; font-size: 11px; } }
-@media (max-width: 768px) { html, body { overflow-x: hidden; } body { margin-top: 0 !important; padding-bottom: 80px; } .top-nav { top: auto; bottom: 0; height: 60px; } .page { padding: 0 10px; margin-bottom: 80px; } .controls.card { padding: 10px; } .fam-board { grid-template-columns: 1fr 1fr !important; gap: 8px !important; } .fam-col { max-height: 140px !important; } .fam-chip { font-size: 10px !important; padding: 3px 6px !important; } .fam-labels { gap: 10px !important; } .fam-label { font-size: 12px !important; } .floating-save { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; } h2 { font-size: 18px; } .row-grid2 { grid-template-columns: 1fr 1fr !important; gap: 8px !important; } .bottom-line { font-size: 11px; padding: 5px 6px !important; flex-wrap: wrap; } .bottom-name { font-size: 11px !important; } .bottom-meta { font-size: 10px !important; margin-left: 0 !important; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; } .pos-badge { padding: 2px 5px !important; font-size: 10px !important; min-width: 28px !important; } .card { margin: 6px 0; padding: 8px 10px !important; } }
+@media (max-width: 768px) { html, body { overflow-x: hidden; } body { margin-top: 0 !important; padding-bottom: 80px; } .top-nav { top: auto; bottom: 0; height: 60px; } .page { padding: 0 10px; margin-bottom: 80px; } .controls.card { padding: 10px; } .fam-board { grid-template-columns: 1fr 1fr !important; gap: 8px !important; } .fam-col { max-height: 140px !important; } .fam-chip { font-size: 10px !important; padding: 3px 6px !important; } .fam-labels { gap: 10px !important; } .fam-label { font-size: 12px !important; } .floating-save { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; } h2 { font-size: 18px; } .row-grid2 { grid-template-columns: 1fr 1fr !important; gap: 8px !important; } .bottom-line { font-size: 11px; padding: 5px 6px !important; flex-wrap: wrap; } .bottom-name { font-size: 11px !important; } .bottom-meta { font-size: 10px !important; margin-left: 0 !important; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; } .pos-bar-wrap { min-width: 55px !important; gap: 4px !important; } .pos-bar-bg { width: 35px !important; height: 6px !important; } .pos-num, .pos-num-top { font-size: 10px !important; min-width: 22px !important; } .card { margin: 6px 0; padding: 8px 10px !important; } }
 .nav-label { display: inline; font-size: 13px; font-weight: 600; }
 .rank-select { padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; min-width: 100px; background: white; cursor: pointer; }
 .rank-select:focus { outline: none; border-color: #2563eb; }
@@ -159,17 +159,11 @@ input.default-target { width: 72px; margin-left: 6px; }
 .rank-item { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .rank-label { font-size: 12px; color: #475569; font-weight: 600; margin-right: 4px; }
 .update-time { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 8px; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; display: inline-block; }
-.pos-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 13px; min-width: 38px; text-align: center; }
-.pos-1 { background: linear-gradient(135deg, #1a472a, #2d5a3d); color: #ffd700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-.pos-2 { background: #1B5E20; color: #fff; }
-.pos-3 { background: #2E7D32; color: #fff; }
-.pos-4 { background: #388E3C; color: #fff; }
-.pos-5 { background: #43A047; color: #fff; }
-.pos-6 { background: #66BB6A; color: #000; }
-.pos-7 { background: #81C784; color: #000; }
-.pos-8 { background: #A5D6A7; color: #000; }
-.pos-9 { background: #C8E6C9; color: #000; }
-.pos-10 { background: #E8F5E9; color: #000; }
+.pos-bar-wrap { display: inline-flex; align-items: center; gap: 6px; min-width: 70px; }
+.pos-bar-bg { display: inline-block; width: 50px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+.pos-bar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.2s ease; }
+.pos-num { font-weight: 700; font-size: 12px; color: #475569; min-width: 28px; }
+.pos-num-top { font-weight: 800; font-size: 13px; color: #15803d; min-width: 28px; }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
@@ -177,7 +171,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:05 OT</div>
+<div class='update-time'>🕐 27.01.2026 18:12 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -253,19 +247,38 @@ input.default-target { width: 72px; margin-left: 6px; }
         return '#e5e7eb';
     }
 
-    function getPosClass(pos) {
+    function getPosPercent(pos) {
         const n = Number(pos);
-        if (isNaN(n) || n <= 0) return 'pos-10';
-        if (n === 1) return 'pos-1';
-        if (n === 2) return 'pos-2';
-        if (n === 3) return 'pos-3';
-        if (n === 4) return 'pos-4';
-        if (n === 5) return 'pos-5';
-        if (n <= 10) return 'pos-6';
-        if (n <= 20) return 'pos-7';
-        if (n <= 50) return 'pos-8';
-        if (n <= 100) return 'pos-9';
-        return 'pos-10';
+        if (isNaN(n) || n <= 0) return 5;
+        if (n === 1) return 100;
+        if (n <= 5) return 95 - (n - 2) * 8;
+        if (n <= 10) return 70 - (n - 5) * 6;
+        if (n <= 20) return 45 - (n - 10) * 2;
+        if (n <= 50) return 28 - (n - 20) * 0.4;
+        if (n <= 100) return 16 - (n - 50) * 0.12;
+        return 10;
+    }
+
+    function getPosColor(pos) {
+        const n = Number(pos);
+        if (isNaN(n) || n <= 0) return '#e5e7eb';
+        if (n === 1) return '#15803d';
+        if (n <= 3) return '#16a34a';
+        if (n <= 5) return '#22c55e';
+        if (n <= 10) return '#4ade80';
+        if (n <= 20) return '#86efac';
+        if (n <= 50) return '#bbf7d0';
+        return '#dcfce7';
+    }
+
+    function posBarHtml(pos) {
+        const n = Number(pos);
+        if (isNaN(n) || n <= 0) return '';
+        const pct = getPosPercent(n);
+        const color = getPosColor(n);
+        const isTop = n <= 5;
+        const numClass = isTop ? 'pos-num-top' : 'pos-num';
+        return `<span class="pos-bar-wrap"><span class="pos-bar-bg"><span class="pos-bar-fill" style="width:${pct}%;background:${color}"></span></span><span class="${numClass}">#${n}</span></span>`;
     }
 
     function fmtDisplay(rec, side = 'ally') {
@@ -276,7 +289,7 @@ input.default-target { width: 72px; margin-left: 6px; }
         const href = normHref(rec?.UserHref);
         const shieldHtml = shieldDot(rec);
         const posNum = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? Math.round(Number(pos)) : null;
-        const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
+        const posHtml = posNum !== null ? posBarHtml(posNum) : '';
         const orderMap = new Map();
         (data.initialRankSelection || []).forEach((r, idx) => orderMap.set(r, idx));
         const rankTier = orderMap.has(rank) ? orderMap.get(rank) : 99;
@@ -1034,7 +1047,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
         const fmtRow = m => {
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
-            const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
+            const posHtml = posNum !== null ? posBarHtml(posNum) : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
             const rankStr = m.Rank ? ` ${m.Rank}` : '';
             const shieldDotHtml = shieldDot(m);
@@ -1219,7 +1232,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
         const fmtRow = m => {
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
-            const posHtml = posNum !== null ? `<span class="pos-badge ${getPosClass(posNum)}">#${posNum}</span>` : '';
+            const posHtml = posNum !== null ? posBarHtml(posNum) : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
             const rankStr = m.Rank ? ` ${m.Rank}` : '';
             const shieldDotHtml = shieldDot(m);
