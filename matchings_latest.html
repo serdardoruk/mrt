@@ -166,7 +166,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 19:01 OT</div>
+<div class='update-time'>🕐 27.01.2026 19:05 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -1069,13 +1069,14 @@ input.default-target { width: 72px; margin-left: 6px; }
         const fmtRow = m => {
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
             const posHtml = posNum !== null ? posBarHtml(posNum) : '';
-            const famStr = m.Family ? ` (${m.Family})` : '';
+            const famColor = m.Family ? pickFamColor(m.Family, 'ally') : '';
+            const famHtml = m.Family ? ` <span style="color:${famColor}">${m.Family}</span>` : '';
             const rankStr = m.Rank ? ` ${shortRank(m.Rank)}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
-            return `<div class="bottom-line" title="${esc(titleFor(m))}">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famStr}${rankStr}</span></div>`;
+            return `<div class="bottom-line" title="${esc(titleFor(m))}">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famHtml}${rankStr}</span></div>`;
         };
 
         wrap.innerHTML = `
@@ -1170,14 +1171,15 @@ input.default-target { width: 72px; margin-left: 6px; }
             const pos = m.Pos;
             const rank = m.Rank || '';
             const posStr = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? ` #${Math.round(Number(pos))}` : '';
-            const famStr = m.Family ? ` (${m.Family})` : '';
+            const famColor = m.Family ? pickFamColor(m.Family, side) : '';
+            const famHtml = m.Family ? ` <span style="color:${famColor}">${m.Family}</span>` : '';
             const rankStr = rank ? ` ${shortRank(rank)}` : '';
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
             const baseLabel = side === 'ally'
                 ? `<strong>${name}</strong>`
-                : `<strong>${name}</strong>${posStr}${famStr}${rankStr}`.trim();
+                : `<strong>${name}</strong>${posStr}${famHtml}${rankStr}`.trim();
             const label = `${linkOpen}${baseLabel}${linkClose}`;
             const isExcluded = side === 'ally' ? excludedAllies.has(name) : excludedEnemies.has(name);
             const cls = isExcluded ? 'pill excluded' : 'pill';
@@ -1206,7 +1208,7 @@ input.default-target { width: 72px; margin-left: 6px; }
         const fam = rec?.Family || '';
         const rank = rec?.Rank || '';
         const posStr = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? `#${Math.round(Number(pos))} ` : '';
-        const famStr = fam ? ` (${fam})` : '';
+        const famStr = fam ? ` ${fam}` : '';
         const rankStr = rank ? ` ${shortRank(rank)}` : '';
         return `${posStr}${name}${famStr}${rankStr}`.trim();
     }
@@ -1225,7 +1227,7 @@ input.default-target { width: 72px; margin-left: 6px; }
     function fmtLineForCopy(m) {
         const name = m.Name || '';
         const posStr = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? `#${Math.round(Number(m.Pos))} ` : '';
-        const famStr = m.Family ? ` (${m.Family})` : '';
+        const famStr = m.Family ? ` ${m.Family}` : '';
         const rankStr = m.Rank ? ` ${m.Rank}` : '';
         return `- **${name}** ${posStr}${famStr}${rankStr}`.trim();
     }
@@ -1254,13 +1256,14 @@ input.default-target { width: 72px; margin-left: 6px; }
         const fmtRow = m => {
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
             const posHtml = posNum !== null ? posBarHtml(posNum) : '';
-            const famStr = m.Family ? ` (${m.Family})` : '';
+            const famColor = m.Family ? pickFamColor(m.Family, 'ally') : '';
+            const famHtml = m.Family ? ` <span style="color:${famColor}">${m.Family}</span>` : '';
             const rankStr = m.Rank ? ` ${shortRank(m.Rank)}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
-            return `<div class="bottom-line">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famStr}${rankStr}</span></div>`;
+            return `<div class="bottom-line">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famHtml}${rankStr}</span></div>`;
         };
 
         wrap.innerHTML = `
