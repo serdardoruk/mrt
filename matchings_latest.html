@@ -169,7 +169,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:35 OT</div>
+<div class='update-time'>🕐 27.01.2026 18:36 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -266,14 +266,14 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function getPosTier(pos) {
         const n = Number(pos);
-        if (isNaN(n) || n <= 0) return { color: '#e5e7eb', tierName: 'none' };
-        if (n === 1) return { color: '#f59e0b', tierName: 'legend' };      // Altın
-        if (n <= 5) return { color: '#eab308', tierName: 'top5' };         // Sarı
-        if (n <= 20) return { color: '#84cc16', tierName: 'top20' };       // Lime
-        if (n <= 50) return { color: '#22c55e', tierName: 'top50' };       // Yeşil
-        if (n <= 100) return { color: '#6ee7b7', tierName: 'top100' };     // Açık yeşil
-        if (n <= 200) return { color: '#a7f3d0', tierName: 'top200' };     // Çok açık
-        return { color: '#e5e7eb', tierName: 'none' };                     // Gri
+        if (isNaN(n) || n <= 0) return { color: '#f3f4f6', tierName: 'none' };
+        if (n === 1) return { color: '#14532d', tierName: 'legend' };      // En koyu yeşil
+        if (n <= 5) return { color: '#166534', tierName: 'top5' };         // Koyu yeşil
+        if (n <= 20) return { color: '#15803d', tierName: 'top20' };       // Yeşil
+        if (n <= 50) return { color: '#22c55e', tierName: 'top50' };       // Orta yeşil
+        if (n <= 100) return { color: '#4ade80', tierName: 'top100' };     // Açık yeşil
+        if (n <= 200) return { color: '#86efac', tierName: 'top200' };     // Çok açık yeşil
+        return { color: '#dcfce7', tierName: 'none' };                     // En açık
     }
 
     function posBarHtml(pos) {
