@@ -166,7 +166,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:48 OT</div>
+<div class='update-time'>🕐 27.01.2026 18:51 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -260,6 +260,25 @@ input.default-target { width: 72px; margin-left: 6px; }
         // #200+
         return 20;
     }
+
+    const RANK_SHORT = {
+        'Bruglione': 'Brug',
+        'Chief': 'Chief',
+        'Local Chief': 'LChief',
+        'Assassin': 'Assn',
+        'Swindler': 'Swind',
+        'Thief': 'Thief',
+        'Mobster': 'Mob',
+        'Soldier': 'Sold',
+        'Picciotto': 'Picc',
+        'Associate': 'Assoc',
+        'Pickpocket': 'Pick',
+        'Shoplifter': 'Shop',
+        'Empty-suit': 'Empty',
+        'Delivery Boy': 'DBoy',
+        'Delivery Girl': 'DGirl'
+    };
+    function shortRank(r) { return RANK_SHORT[r] || r; }
 
     function getPosTier(pos) {
         const n = Number(pos);
@@ -1050,7 +1069,7 @@ input.default-target { width: 72px; margin-left: 6px; }
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
             const posHtml = posNum !== null ? posBarHtml(posNum) : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
-            const rankStr = m.Rank ? ` ${m.Rank}` : '';
+            const rankStr = m.Rank ? ` ${shortRank(m.Rank)}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
@@ -1060,8 +1079,8 @@ input.default-target { width: 72px; margin-left: 6px; }
 
         wrap.innerHTML = `
             <div class="row-grid2">
-                <div class="card"><strong>Blood (Pos sıralı) [${allyList.length}]</strong><div class="bottom-list">${allyList.map(fmtRow).join('')}</div></div>
-                <div class="card"><strong>Düşman (Pos sıralı) [${enemyList.length}]</strong><div class="bottom-list">${enemyList.map(fmtRow).join('')}</div></div>
+                <div class="card"><strong>Blood</strong><div class="bottom-list">${allyList.map(fmtRow).join('')}</div></div>
+                <div class="card"><strong>Düşman</strong><div class="bottom-list">${enemyList.map(fmtRow).join('')}</div></div>
             </div>`;
     }
 
@@ -1151,7 +1170,7 @@ input.default-target { width: 72px; margin-left: 6px; }
             const rank = m.Rank || '';
             const posStr = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? ` #${Math.round(Number(pos))}` : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
-            const rankStr = rank ? ` ${rank}` : '';
+            const rankStr = rank ? ` ${shortRank(rank)}` : '';
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
             const linkClose = href ? "</a>" : '';
@@ -1187,7 +1206,7 @@ input.default-target { width: 72px; margin-left: 6px; }
         const rank = rec?.Rank || '';
         const posStr = (pos !== undefined && pos !== null && pos !== '' && !Number.isNaN(Number(pos))) ? `#${Math.round(Number(pos))} ` : '';
         const famStr = fam ? ` (${fam})` : '';
-        const rankStr = rank ? ` ${rank}` : '';
+        const rankStr = rank ? ` ${shortRank(rank)}` : '';
         return `${posStr}${name}${famStr}${rankStr}`.trim();
     }
 
@@ -1235,7 +1254,7 @@ input.default-target { width: 72px; margin-left: 6px; }
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
             const posHtml = posNum !== null ? posBarHtml(posNum) : '';
             const famStr = m.Family ? ` (${m.Family})` : '';
-            const rankStr = m.Rank ? ` ${m.Rank}` : '';
+            const rankStr = m.Rank ? ` ${shortRank(m.Rank)}` : '';
             const shieldDotHtml = shieldDot(m);
             const href = normHref(m.UserHref);
             const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
@@ -1247,14 +1266,14 @@ input.default-target { width: 72px; margin-left: 6px; }
             <div class="row-grid2 bottom-block">
                 <div class="card">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                        <strong>Blood (Pos sıralı) [${allyList.length}]</strong>
+                        <strong>Blood</strong>
                         <button id="copyBottomAlliesBtn" class="icon-btn">Kopyala</button>
                     </div>
                     <div class="bottom-list">${allyList.map(fmtRow).join('')}</div>
                 </div>
                 <div class="card">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                        <strong>Düşman (Pos sıralı) [${enemyList.length}]</strong>
+                        <strong>Düşman</strong>
                         <button id="copyBottomEnemiesBtn" class="icon-btn">Kopyala</button>
                     </div>
                     <div class="bottom-list">${enemyList.map(fmtRow).join('')}</div>
