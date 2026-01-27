@@ -166,7 +166,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 27.01.2026 18:58 OT</div>
+<div class='update-time'>🕐 27.01.2026 19:01 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -282,14 +282,14 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function getPosTier(pos) {
         const n = Number(pos);
-        if (isNaN(n) || n <= 0) return { color: '#f3f4f6', tierName: 'none' };
-        if (n === 1) return { color: '#78350f', tierName: 'legend' };      // En koyu altın
-        if (n <= 5) return { color: '#92400e', tierName: 'top5' };         // Koyu altın
-        if (n <= 20) return { color: '#b45309', tierName: 'top20' };       // Turuncu-altın
-        if (n <= 50) return { color: '#ca8a04', tierName: 'top50' };       // Koyu sarı
-        if (n <= 100) return { color: '#eab308', tierName: 'top100' };     // Sarı
-        if (n <= 200) return { color: '#fbbf24', tierName: 'top200' };     // Açık sarı
-        return { color: '#fde68a', tierName: 'none' };                     // En açık sarı
+        if (isNaN(n) || n <= 0) return { color: '#f3f4f6', tierName: 'none', icon: '' };
+        if (n === 1) return { color: '#78350f', tierName: 'legend', icon: '👑' };    // En koyu altın
+        if (n <= 5) return { color: '#92400e', tierName: 'top5', icon: '⭐' };        // Koyu altın
+        if (n <= 20) return { color: '#b45309', tierName: 'top20', icon: '✦' };      // Turuncu-altın
+        if (n <= 50) return { color: '#ca8a04', tierName: 'top50', icon: '•' };      // Koyu sarı
+        if (n <= 100) return { color: '#eab308', tierName: 'top100', icon: '' };     // Sarı
+        if (n <= 200) return { color: '#fbbf24', tierName: 'top200', icon: '' };     // Açık sarı
+        return { color: '#fde68a', tierName: 'none', icon: '' };                     // En açık sarı
     }
 
     function posBarHtml(pos) {
@@ -298,7 +298,8 @@ input.default-target { width: 72px; margin-left: 6px; }
         const tier = getPosTier(n);
         const isLight = ['top100', 'top200', 'none'].includes(tier.tierName);
         const textColor = isLight ? '#78350f' : '#fff';
-        return `<span style="background:${tier.color};color:${textColor};padding:1px 4px;border-radius:3px;font-weight:700">#${n}</span>`;
+        const iconPart = tier.icon ? tier.icon + ' ' : '';
+        return `<span style="background:${tier.color};color:${textColor};padding:1px 4px;border-radius:3px;font-weight:700">${iconPart}#${n}</span>`;
     }
 
     function fmtDisplay(rec, side = 'ally') {
