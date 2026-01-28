@@ -71,7 +71,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 18:23 OT</div>
+    <div class="update-time">🕐 28.01.2026 19:28 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -138,9 +138,10 @@ function renderBaskinList() {
     
     container.innerHTML = baskinList.map((item, idx) => {
         const e = item.enemy;
-        const shootersHtml = item.shooters.map((s, sIdx) => 
-            `<span class="shooter-badge">${s.Name} <span class="remove" onclick="removeShooter(${idx}, ${sIdx})">×</span></span>`
-        ).join('');
+        const shootersHtml = item.shooters.map((s, sIdx) => {
+            const sPos = s.Pos && s.Pos < 9000 ? `#${s.Pos}` : '';
+            return `<span class="shooter-badge">${sPos} ${s.Name} <span style="opacity:0.7;font-size:11px">${s.Family}</span> <span class="remove" onclick="removeShooter(${idx}, ${sIdx})">×</span></span>`;
+        }).join('');
         
         return `
             <div class="baskin-item">
@@ -190,6 +191,14 @@ function removeEnemy(idx) {
     renderBaskinList();
 }
 
+function removeFamily(familyName) {
+    const before = baskinList.length;
+    baskinList = baskinList.filter(b => b.enemy.Family !== familyName);
+    const removed = before - baskinList.length;
+    renderBaskinList();
+    if (removed > 0) alert(`${familyName} ailesinden ${removed} kişi silindi!`);
+}
+
 function openShooterModal(enemyIdx) {
     currentEnemyIdx = enemyIdx;
     document.getElementById('shooterModal').classList.add('show');
@@ -204,16 +213,19 @@ function closeShooterModal() {
 }
 
 function renderShooterList(query) {
-    const q = query.toLowerCase();
-    const filtered = allPlayers.filter(p => 
-        p.Name.toLowerCase().includes(q) || p.Family.toLowerCase().includes(q)
-    ).slice(0, 50);
+    const q = (query || '').toLowerCase().trim();
+    const filtered = allPlayers.filter(p => {
+        const name = (p.Name || '').toLowerCase();
+        const fam = (p.Family || '').toLowerCase();
+        if (!q) return true;
+        return name.includes(q) || fam.includes(q);
+    }).sort((a,b) => (a.Pos || 9999) - (b.Pos || 9999)).slice(0, 50);
     
     document.getElementById('shooterList').innerHTML = filtered.map(p => `
-        <div class="modal-item" onclick="addShooter('${p.Name.replace(/'/g, "\'")}')">
+        <div class="modal-item" onclick="addShooter('${(p.Name || '').replace(/'/g, "\'")}')">
             ${posHtml(p.Pos)}
             <strong>${p.Name}</strong>
-            <span style="color:#94a3b8">${p.Family}</span>
+            <span style="color:#94a3b8">${p.Family} ${p.Rank || ''}</span>
         </div>
     `).join('');
 }
@@ -279,7 +291,7 @@ const familyDropdown = document.getElementById('familyDropdown');
 const allFamilies = [...new Set(allPlayers.map(p => p.Family).filter(f => f && f !== '-'))].sort();
 
 familySearch.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
+    const q = (e.target.value || '').toLowerCase().trim();
     if (q.length < 1) {
         familyDropdown.classList.remove('show');
         return;
@@ -289,9 +301,12 @@ familySearch.addEventListener('input', (e) => {
     
     familyDropdown.innerHTML = filtered.map(fam => {
         const count = allPlayers.filter(p => p.Family === fam).length;
-        return `<div class="player-option" onclick="addFamily('${fam}')">
-            <strong>🏠 ${fam}</strong>
-            <span style="color:#94a3b8">(${count} üye)</span>
+        const inList = baskinList.filter(b => b.enemy.Family === fam).length;
+        const addBtn = `<span onclick="event.stopPropagation();addFamily('${fam}')" style="cursor:pointer;padding:4px 8px;background:#22c55e;border-radius:4px;margin-left:8px;">+Ekle</span>`;
+        const delBtn = inList > 0 ? `<span onclick="event.stopPropagation();removeFamily('${fam}')" style="cursor:pointer;padding:4px 8px;background:#ef4444;border-radius:4px;margin-left:4px;">-Sil (${inList})</span>` : '';
+        return `<div class="player-option" style="justify-content:space-between;">
+            <div><strong>🏠 ${fam}</strong> <span style="color:#94a3b8">(${count} üye)</span></div>
+            <div>${addBtn}${delBtn}</div>
         </div>`;
     }).join('');
     
@@ -303,15 +318,17 @@ const enemySearch = document.getElementById('enemySearch');
 const enemyDropdown = document.getElementById('enemyDropdown');
 
 enemySearch.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
-    if (q.length < 2) {
+    const q = (e.target.value || '').toLowerCase().trim();
+    if (q.length < 1) {
         enemyDropdown.classList.remove('show');
         return;
     }
     
-    const filtered = allPlayers.filter(p => 
-        p.Name.toLowerCase().includes(q) || p.Family.toLowerCase().includes(q)
-    ).slice(0, 20);
+    const filtered = allPlayers.filter(p => {
+        const name = (p.Name || '').toLowerCase();
+        const fam = (p.Family || '').toLowerCase();
+        return name.includes(q) || fam.includes(q);
+    }).sort((a,b) => (a.Pos || 9999) - (b.Pos || 9999)).slice(0, 30);
     
     enemyDropdown.innerHTML = filtered.map(p => `
         <div class="player-option" onclick="addEnemy(${JSON.stringify(p).replace(/"/g, '&quot;')})">
