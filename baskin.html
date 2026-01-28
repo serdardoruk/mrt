@@ -107,7 +107,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG: shared ATK/DEF per shooter, click names to toggle, click levels to adjust
+    🚀 BG: each has own ATK/DEF, preset buttons for all at once
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -115,7 +115,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:51 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:52 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -196,10 +196,21 @@ function renderBaskinList() {
                 {name:'Ray', atk:0, def:10},
                 {name:'Lee', atk:0, def:10}
             ];
-            const bgs = s.bgs || {};
+            // Handle old array format or new object format
+            let bgs = s.bgs || {};
+            if (Array.isArray(bgs)) {
+                const newBgs = {};
+                bgs.forEach((bg, i) => {
+                    if (bg && typeof bg === 'object' && bg.atk !== undefined) {
+                        newBgs[i] = bg;
+                    }
+                });
+                bgs = newBgs;
+                s.bgs = newBgs;
+            }
             const bgsHtml = bgDefaults.map((info, i) => {
                 const bg = bgs[i];
-                const isActive = bg !== undefined;
+                const isActive = bg !== undefined && bg !== null;
                 if (!isActive) {
                     return `<div class="shooter-bg-item inactive" onclick="enableBg(${idx},${sIdx},${i})" title="${info.name} - Click to enable">${info.name}</div>`;
                 }
