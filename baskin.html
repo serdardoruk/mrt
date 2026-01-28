@@ -105,7 +105,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:35 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:39 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -193,11 +193,11 @@ function renderBaskinList() {
                 if (bg === true || bg === 'atk' || bg === 'def' || (typeof bg === 'object' && bg !== null && bg.atkLvl !== undefined)) {
                     bg = null; // Reset old format
                 }
-                const isActive = bg && typeof bg === 'object' && (bg.atk > 0 || bg.def > 0);
+                const isActive = bg && typeof bg === 'object';
                 if (!isActive) {
-                    return `<div class="shooter-bg-item inactive" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - L:ATK R:DEF">${info.name}</div>`;
+                    return `<div class="shooter-bg-item inactive" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - Click to enable">${info.name}</div>`;
                 }
-                return `<div class="shooter-bg-item active" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - L:ATK+ R:DEF+">
+                return `<div class="shooter-bg-item active" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="L:ATK+ R:DEF+ Shift:OFF">
                     <span class="bg-name">${info.name}</span>
                     <span class="bg-vals"><span class="bg-atk">${bg.atk}</span>/<span class="bg-def">${bg.def}</span></span>
                 </div>`;
@@ -337,6 +337,7 @@ function clickBg(event, enemyIdx, shooterIdx, bgIdx) {
     if (!shooter.bgs) shooter.bgs = [null,null,null,null,null,null];
     let bg = shooter.bgs[bgIdx];
     const isRight = event.button === 2;
+    const isShift = event.shiftKey;
     
     // Handle old formats
     if (bg === true || bg === 'atk' || bg === 'def' || (typeof bg === 'object' && bg !== null && bg.atkLvl !== undefined)) {
@@ -344,9 +345,17 @@ function clickBg(event, enemyIdx, shooterIdx, bgIdx) {
         shooter.bgs[bgIdx] = null;
     }
     
-    if (!bg || (bg.atk === 0 && bg.def === 0)) {
+    // Shift+click = disable
+    if (isShift && bg) {
+        shooter.bgs[bgIdx] = null;
+        saveState();
+        renderBaskinList();
+        return;
+    }
+    
+    if (!bg) {
         // Inactive - activate with defaults
-        const activeCount = shooter.bgs.filter(b => b && (b.atk > 0 || b.def > 0)).length;
+        const activeCount = shooter.bgs.filter(b => b && typeof b === 'object').length;
         if (activeCount >= 5) {
             alert('Max 5 BG!');
             return;
@@ -354,15 +363,19 @@ function clickBg(event, enemyIdx, shooterIdx, bgIdx) {
         const def = bgDefaults[bgIdx];
         shooter.bgs[bgIdx] = { atk: def.atk, def: def.def };
     } else {
-        // Active - adjust
+        // Active - adjust (ATK + DEF = 10)
         if (isRight) {
-            bg.def = (bg.def + 1) % 11;
+            // DEF up, ATK down
+            if (bg.def < 10) {
+                bg.def++;
+                bg.atk--;
+            }
         } else {
-            bg.atk = (bg.atk + 1) % 11;
-        }
-        // If both 0, deactivate
-        if (bg.atk === 0 && bg.def === 0) {
-            shooter.bgs[bgIdx] = null;
+            // ATK up, DEF down
+            if (bg.atk < 10) {
+                bg.atk++;
+                bg.def--;
+            }
         }
     }
     saveState();
