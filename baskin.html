@@ -55,10 +55,13 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-name { font-weight: 600; color: #16a34a; font-size: 11px; }
 .shooter-meta { color: #64748b; font-size: 9px; }
 .shooter-bg { display: flex; gap: 2px; align-items: center; }
-.shooter-bg-item { padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; cursor: pointer; }
+.shooter-bg-item { padding: 2px 4px; border-radius: 3px; font-size: 8px; font-weight: 600; cursor: pointer; user-select: none; }
 .shooter-bg-item.inactive { background: #f1f5f9; border: 1px dashed #cbd5e1; color: #94a3b8; opacity: 0.5; }
-.shooter-bg-item.atk { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.4); color: #dc2626; }
-.shooter-bg-item.def { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.4); color: #2563eb; }
+.shooter-bg-item.active { background: linear-gradient(90deg, rgba(220,38,38,0.15) 0%, rgba(37,99,235,0.15) 100%); border: 1px solid #94a3b8; }
+.shooter-bg-item .bg-name { font-size: 8px; }
+.shooter-bg-item .bg-vals { font-size: 9px; font-weight: 700; }
+.shooter-bg-item .bg-atk { color: #dc2626; }
+.shooter-bg-item .bg-def { color: #2563eb; }
 .shooter-bg-item:hover { opacity: 0.8; }
 .shooter-bg-label { font-size: 9px; }
 .shooter-order { display: flex; flex-direction: column; gap: 1px; margin-left: auto; }
@@ -102,7 +105,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:27 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:31 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -185,9 +188,15 @@ function renderBaskinList() {
             ];
             const bgs = s.bgs || [null,null,null,null,null,null];
             const bgsHtml = bgDefaults.map((info, i) => {
-                const state = bgs[i];
-                const cls = state === 'atk' ? 'atk' : state === 'def' ? 'def' : 'inactive';
-                return `<div class="shooter-bg-item ${cls}" onclick="toggleBg(${idx},${sIdx},${i})" title="${info.name}">${info.name}</div>`;
+                const bg = bgs[i];
+                const isActive = bg && (bg.atk > 0 || bg.def > 0);
+                if (!isActive) {
+                    return `<div class="shooter-bg-item inactive" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - L:ATK R:DEF">${info.name}</div>`;
+                }
+                return `<div class="shooter-bg-item active" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - L:ATK+ R:DEF+">
+                    <span class="bg-name">${info.name}</span>
+                    <span class="bg-vals"><span class="bg-atk">${bg.atk}</span>/<span class="bg-def">${bg.def}</span></span>
+                </div>`;
             }).join('');
             return `<div class="shooter-row">
                 ${sPos}
@@ -310,24 +319,42 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     saveState();
 }
 
-function toggleBg(enemyIdx, shooterIdx, bgIdx) {
+function clickBg(event, enemyIdx, shooterIdx, bgIdx) {
+    event.preventDefault();
+    const bgDefaults = [
+        {name:'Vic', atk:10, def:0},
+        {name:'Lex', atk:10, def:0},
+        {name:'Joe', atk:5, def:5},
+        {name:'Ike', atk:5, def:5},
+        {name:'Ray', atk:0, def:10},
+        {name:'Lee', atk:0, def:10}
+    ];
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.bgs) shooter.bgs = [null,null,null,null,null,null];
-    const current = shooter.bgs[bgIdx];
-    let next;
-    if (current === null || current === undefined) {
-        const activeCount = shooter.bgs.filter(b => b === 'atk' || b === 'def').length;
+    let bg = shooter.bgs[bgIdx];
+    const isRight = event.button === 2;
+    
+    if (!bg || (bg.atk === 0 && bg.def === 0)) {
+        // Inactive - activate with defaults
+        const activeCount = shooter.bgs.filter(b => b && (b.atk > 0 || b.def > 0)).length;
         if (activeCount >= 5) {
             alert('Max 5 BG!');
             return;
         }
-        next = 'atk';
-    } else if (current === 'atk') {
-        next = 'def';
+        const def = bgDefaults[bgIdx];
+        shooter.bgs[bgIdx] = { atk: def.atk, def: def.def };
     } else {
-        next = null;
+        // Active - adjust
+        if (isRight) {
+            bg.def = (bg.def + 1) % 11;
+        } else {
+            bg.atk = (bg.atk + 1) % 11;
+        }
+        // If both 0, deactivate
+        if (bg.atk === 0 && bg.def === 0) {
+            shooter.bgs[bgIdx] = null;
+        }
     }
-    shooter.bgs[bgIdx] = next;
     saveState();
     renderBaskinList();
 }
