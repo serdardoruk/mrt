@@ -102,7 +102,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:49 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:50 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -175,7 +175,7 @@ function renderBaskinList() {
             const sRank = s.Rank ? `${s.Rank}` : '';
             const isFirst = sIdx === 0;
             const isLast = sIdx === item.shooters.length - 1;
-            const bgNames = ['Ninja','Thug','Juggler','Clown','Mime','Tank'];
+            const bgNames = ['Vic','Lex','Ike','Joe','Lee','Ray'];
             const bgs = s.bgs || [{},{},{},{},{},{}];
             const bgsHtml = bgNames.map((name, i) => {
                 const bg = bgs[i] || {};
@@ -308,7 +308,7 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
 }
 
 function editShooterBg(enemyIdx, shooterIdx, bgIdx) {
-    const bgNames = ['Ninja','Thug','Juggler','Clown','Mime','Tank'];
+    const bgNames = ['Vic','Lex','Ike','Joe','Lee','Ray'];
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.bgs) shooter.bgs = [{},{},{},{},{},{}];
     const bg = shooter.bgs[bgIdx] || {};
