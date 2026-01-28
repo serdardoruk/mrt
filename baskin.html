@@ -54,10 +54,12 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-pos { font-weight: 700; font-size: 10px; color: #0f172a; }
 .shooter-name { font-weight: 600; color: #16a34a; font-size: 11px; }
 .shooter-meta { color: #64748b; font-size: 9px; }
-.shooter-bg { display: flex; gap: 2px; align-items: center; }
-.shooter-bg input { width: 28px; padding: 1px 2px; border-radius: 3px; font-size: 9px; border: 1px solid #cbd5e1; background: #fff; text-align: center; }
-.shooter-bg input:focus { outline: none; border-color: #2563eb; }
-.shooter-bg-label { font-size: 10px; }
+.shooter-bg { display: flex; flex-direction: column; gap: 1px; align-items: center; }
+.shooter-bg-row { display: flex; align-items: center; gap: 2px; }
+.shooter-bg-val { font-size: 9px; font-weight: 600; min-width: 22px; text-align: center; }
+.shooter-bg-btn { width: 14px; height: 14px; border: 1px solid #cbd5e1; background: #fff; border-radius: 2px; cursor: pointer; font-size: 9px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.shooter-bg-btn:hover { background: #e2e8f0; }
+.shooter-bg-label { font-size: 9px; }
 .shooter-order { display: flex; flex-direction: column; gap: 1px; margin-left: auto; }
 .shooter-order button { width: 16px; height: 12px; border: 1px solid #cbd5e1; background: #fff; border-radius: 2px; cursor: pointer; font-size: 8px; line-height: 1; }
 .shooter-order button:hover { background: #e2e8f0; }
@@ -99,7 +101,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:30 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:43 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -179,10 +181,18 @@ function renderBaskinList() {
                 <span class="shooter-name">${s.Name}</span>
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
                 <div class="shooter-bg">
-                    <span class="shooter-bg-label">⚔️</span>
-                    <input type="text" value="${atkBg}" onchange="updateShooterAtk(${idx},${sIdx},this.value)" placeholder="Atk">
-                    <span class="shooter-bg-label">🛡️</span>
-                    <input type="text" value="${defBg}" readonly style="background:#f1f5f9;color:#64748b;">
+                    <div class="shooter-bg-row">
+                        <span class="shooter-bg-label">⚔️</span>
+                        <button class="shooter-bg-btn" onclick="adjustBg(${idx},${sIdx},'atk',-0.1)">-</button>
+                        <span class="shooter-bg-val">${atkBg.toFixed(1)}</span>
+                        <button class="shooter-bg-btn" onclick="adjustBg(${idx},${sIdx},'atk',0.1)">+</button>
+                    </div>
+                    <div class="shooter-bg-row">
+                        <span class="shooter-bg-label">🛡️</span>
+                        <button class="shooter-bg-btn" onclick="adjustBg(${idx},${sIdx},'def',-0.1)">-</button>
+                        <span class="shooter-bg-val">${defBg.toFixed(1)}</span>
+                        <button class="shooter-bg-btn" onclick="adjustBg(${idx},${sIdx},'def',0.1)">+</button>
+                    </div>
                 </div>
                 <div class="shooter-order">
                     <button onclick="moveShooter(${idx}, ${sIdx}, -1)" ${isFirst ? 'disabled' : ''}>▲</button>
@@ -298,11 +308,15 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     saveState();
 }
 
-function updateShooterAtk(enemyIdx, shooterIdx, value) {
-    const atk = parseFloat(value) || 0;
-    const def = Math.max(0, 5 - atk);
-    baskinList[enemyIdx].shooters[shooterIdx].atkBg = atk;
-    baskinList[enemyIdx].shooters[shooterIdx].defBg = parseFloat(def.toFixed(1));
+function adjustBg(enemyIdx, shooterIdx, type, delta) {
+    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
+    if (type === 'atk') {
+        shooter.atkBg = Math.max(0, Math.min(5, (shooter.atkBg || 0) + delta));
+        shooter.atkBg = parseFloat(shooter.atkBg.toFixed(1));
+    } else {
+        shooter.defBg = Math.max(0, Math.min(5, (shooter.defBg || 0) + delta));
+        shooter.defBg = parseFloat(shooter.defBg.toFixed(1));
+    }
     saveState();
     renderBaskinList();
 }
