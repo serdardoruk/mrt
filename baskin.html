@@ -42,8 +42,13 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .stat-btn.inactive:hover { opacity: 0.6; }
 .city-select { padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; cursor: pointer; }
 .city-select:focus { outline: none; border-color: #2563eb; }
-.city-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f1f5f9; border-radius: 6px; margin-top: 4px; }
+.city-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f1f5f9; border-radius: 6px; margin-top: 4px; flex-wrap: wrap; }
 .city-label { font-size: 11px; color: #64748b; }
+.fly-status { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.fly-timer { font-size: 11px; font-weight: 700; color: #ef4444; font-family: monospace; }
+.can-fly { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.can-fly.yes { background: #22c55e; color: #fff; }
+.can-fly.no { background: #ef4444; color: #fff; }
 .shooter-section { display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #22c55e; margin-left: 8px; }
 .shooter-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(34,197,94,0.1); border-radius: 4px; }
 .shooter-pos { font-weight: 700; font-size: 12px; color: #0f172a; }
@@ -94,7 +99,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:24 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:25 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -205,7 +210,6 @@ function renderBaskinList() {
                             <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">🛡️</button>
                             <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
                             <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
-                            <button class="stat-btn travel ${st.travel !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'travel')" title="Travel">✈️</button>
                         </div>
                     </div>
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
@@ -224,6 +228,7 @@ function renderBaskinList() {
                         <option value="Corleone" ${st.city==='Corleone' ? 'selected' : ''}>Corleone</option>
                         <option value="Palermo" ${st.city==='Palermo' ? 'selected' : ''}>Palermo</option>
                     </select>
+                    ${getFlyStatus(st)}
                 </div>
                 ${shootersHtml ? `<div class="shooter-section">${shootersHtml}</div>` : ''}
             </div>
@@ -256,9 +261,30 @@ function toggleStat(enemyIdx, statKey) {
 
 function updateCity(enemyIdx, city) {
     if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    const oldCity = baskinList[enemyIdx].stats.city;
     baskinList[enemyIdx].stats.city = city;
+    // City değişince 30 dk fly cooldown başlat
+    if (city && city !== oldCity) {
+        baskinList[enemyIdx].stats.flyUntil = Date.now() + (30 * 60 * 1000); // 30 dakika
+    }
     saveState();
+    renderBaskinList();
 }
+
+function getFlyStatus(st) {
+    if (!st.flyUntil) return '<div class="fly-status"><span class="can-fly yes">✈️ Can Fly</span></div>';
+    const remaining = st.flyUntil - Date.now();
+    if (remaining <= 0) return '<div class="fly-status"><span class="can-fly yes">✈️ Can Fly</span></div>';
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    return `<div class="fly-status"><span class="can-fly no">✈️ No Fly</span><span class="fly-timer">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</span></div>`;
+}
+
+// Timer'ları güncelle
+setInterval(() => {
+    const hasActiveTimers = baskinList.some(item => item.stats?.flyUntil > Date.now());
+    if (hasActiveTimers) renderBaskinList();
+}, 1000);
 
 function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     baskinList[enemyIdx].shooters[shooterIdx][bgType] = parseFloat(value) || 0;
