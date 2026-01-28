@@ -99,7 +99,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:27 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:30 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -228,7 +228,7 @@ function renderBaskinList() {
                         <option value="Corleone" ${st.city==='Corleone' ? 'selected' : ''}>Corleone</option>
                         <option value="Palermo" ${st.city==='Palermo' ? 'selected' : ''}>Palermo</option>
                     </select>
-                    ${getFlyStatus(st)}
+                    ${getFlyStatus(idx, st)}
                 </div>
                 ${shootersHtml ? `<div class="shooter-section">${shootersHtml}</div>` : ''}
             </div>
@@ -271,13 +271,20 @@ function updateCity(enemyIdx, city) {
     renderBaskinList();
 }
 
-function getFlyStatus(st) {
+function getFlyStatus(idx, st) {
     if (!st.flyUntil) return '<div class="fly-status"><span class="can-fly yes">✈️ Can Fly</span></div>';
     const remaining = st.flyUntil - Date.now();
     if (remaining <= 0) return '<div class="fly-status"><span class="can-fly yes">✈️ Can Fly</span></div>';
     const mins = Math.floor(remaining / 60000);
     const secs = Math.floor((remaining % 60000) / 1000);
-    return `<div class="fly-status"><span class="can-fly no">✈️ No Fly</span><span class="fly-timer">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</span></div>`;
+    return `<div class="fly-status"><span class="can-fly no" onclick="cancelFlyTimer(${idx})" style="cursor:pointer" title="Click to cancel">✈️ No Fly</span><span class="fly-timer">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</span></div>`;
+}
+
+function cancelFlyTimer(enemyIdx) {
+    if (!baskinList[enemyIdx].stats) return;
+    delete baskinList[enemyIdx].stats.flyUntil;
+    saveState();
+    renderBaskinList();
 }
 
 // Timer'ları güncelle
