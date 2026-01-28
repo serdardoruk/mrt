@@ -55,11 +55,12 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-name { font-weight: 600; color: #16a34a; font-size: 11px; }
 .shooter-meta { color: #64748b; font-size: 9px; }
 .shooter-bg { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
-.shooter-bg-item { display: flex; flex-direction: column; align-items: center; padding: 1px 3px; background: rgba(0,0,0,0.03); border-radius: 2px; font-size: 8px; }
+.shooter-bg-item { display: flex; flex-direction: column; align-items: center; padding: 1px 3px; background: rgba(34,197,94,0.15); border-radius: 2px; font-size: 8px; border: 1px solid rgba(34,197,94,0.3); }
+.shooter-bg-item.inactive { background: rgba(0,0,0,0.03); border: 1px dashed #cbd5e1; opacity: 0.4; }
 .shooter-bg-num { font-weight: 700; font-size: 9px; }
 .shooter-bg-vals { display: flex; gap: 1px; font-size: 7px; }
-.shooter-bg-atk { color: #dc2626; }
-.shooter-bg-def { color: #2563eb; }
+.shooter-bg-atk { color: #dc2626; font-weight: 600; }
+.shooter-bg-def { color: #2563eb; font-weight: 600; }
 .shooter-bg-label { font-size: 9px; }
 .shooter-order { display: flex; flex-direction: column; gap: 1px; margin-left: auto; }
 .shooter-order button { width: 16px; height: 12px; border: 1px solid #cbd5e1; background: #fff; border-radius: 2px; cursor: pointer; font-size: 8px; line-height: 1; }
@@ -102,7 +103,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:50 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:56 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -181,9 +182,12 @@ function renderBaskinList() {
                 const bg = bgs[i] || {};
                 const atk = bg.atk || 0;
                 const def = bg.def || 0;
-                return `<div class="shooter-bg-item" onclick="editShooterBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${name} - Click to edit">
+                const isActive = atk > 0 || def > 0;
+                const inactiveClass = isActive ? '' : 'inactive';
+                const display = isActive ? `<span class="shooter-bg-atk">${atk}</span>/<span class="shooter-bg-def">${def}</span>` : '-';
+                return `<div class="shooter-bg-item ${inactiveClass}" onclick="editShooterBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${name} - Click to edit">
                     <span class="shooter-bg-num">${name}</span>
-                    <div class="shooter-bg-vals"><span class="shooter-bg-atk">${atk}</span>/<span class="shooter-bg-def">${def}</span></div>
+                    <div class="shooter-bg-vals">${display}</div>
                 </div>`;
             }).join('');
             return `<div class="shooter-row">
