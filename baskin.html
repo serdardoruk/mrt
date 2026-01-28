@@ -103,7 +103,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:12 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:20 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -176,7 +176,7 @@ function renderBaskinList() {
             const sRank = s.Rank ? `${s.Rank}` : '';
             const isFirst = sIdx === 0;
             const isLast = sIdx === item.shooters.length - 1;
-            const bgInfo = [
+            const bgDefaults = [
                 {name:'Vic', atkLvl:10, defLvl:0},
                 {name:'Lex', atkLvl:10, defLvl:0},
                 {name:'Joe', atkLvl:5, defLvl:5},
@@ -185,11 +185,14 @@ function renderBaskinList() {
                 {name:'Lee', atkLvl:0, defLvl:10}
             ];
             const bgs = s.bgs || [null,null,null,null,null,null];
-            const bgsHtml = bgInfo.map((info, i) => {
-                const isActive = bgs[i] === true;
+            const bgsHtml = bgDefaults.map((info, i) => {
+                const bg = bgs[i];
+                const isActive = bg !== null && bg !== undefined;
                 const inactiveClass = isActive ? '' : 'inactive';
-                const display = isActive ? `<span class="shooter-bg-atk">${info.atkLvl}</span>/<span class="shooter-bg-def">${info.defLvl}</span>` : '-';
-                return `<div class="shooter-bg-item ${inactiveClass}" onclick="toggleBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} - Click to toggle">
+                const atkLvl = isActive ? (bg.atkLvl || 0) : 0;
+                const defLvl = isActive ? (bg.defLvl || 0) : 0;
+                const display = isActive ? `<span class="shooter-bg-atk">${atkLvl}</span>/<span class="shooter-bg-def">${defLvl}</span>` : '-';
+                return `<div class="shooter-bg-item ${inactiveClass}" onclick="toggleBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} - Click to ${isActive ? 'edit' : 'activate'}">
                     <span class="shooter-bg-num">${info.name}</span>
                     <div class="shooter-bg-vals">${display}</div>
                 </div>`;
@@ -316,22 +319,48 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
 }
 
 function toggleBg(enemyIdx, shooterIdx, bgIdx) {
+    const bgDefaults = [
+        {name:'Vic', atkLvl:10, defLvl:0},
+        {name:'Lex', atkLvl:10, defLvl:0},
+        {name:'Joe', atkLvl:5, defLvl:5},
+        {name:'Ike', atkLvl:5, defLvl:5},
+        {name:'Ray', atkLvl:0, defLvl:10},
+        {name:'Lee', atkLvl:0, defLvl:10}
+    ];
+    const info = bgDefaults[bgIdx];
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.bgs) shooter.bgs = [null,null,null,null,null,null];
-    // Count active BGs
-    const activeCount = shooter.bgs.filter(b => b === true).length;
-    const isCurrentlyActive = shooter.bgs[bgIdx] === true;
+    const bg = shooter.bgs[bgIdx];
+    const isActive = bg !== null && bg !== undefined;
     
-    if (isCurrentlyActive) {
-        // Deactivate
-        shooter.bgs[bgIdx] = null;
+    if (isActive) {
+        // Already active - edit or deactivate
+        const currentAtk = bg.atkLvl || 0;
+        const currentDef = bg.defLvl || 0;
+        const input = prompt(`${info.name}
+ATK/DEF levels (0-10)
+Leave empty to deactivate:`, `${currentAtk}/${currentDef}`);
+        if (input === null) return; // cancelled
+        if (input.trim() === '') {
+            // Deactivate
+            shooter.bgs[bgIdx] = null;
+        } else {
+            const parts = input.split('/');
+            if (parts.length === 2) {
+                shooter.bgs[bgIdx] = {
+                    atkLvl: Math.min(10, Math.max(0, parseInt(parts[0]) || 0)),
+                    defLvl: Math.min(10, Math.max(0, parseInt(parts[1]) || 0))
+                };
+            }
+        }
     } else {
-        // Check if already 5 active
+        // Not active - activate with defaults
+        const activeCount = shooter.bgs.filter(b => b !== null && b !== undefined).length;
         if (activeCount >= 5) {
             alert('Max 5 BG! Önce birini kapat.');
             return;
         }
-        shooter.bgs[bgIdx] = true;
+        shooter.bgs[bgIdx] = { atkLvl: info.atkLvl, defLvl: info.defLvl };
     }
     saveState();
     renderBaskinList();
