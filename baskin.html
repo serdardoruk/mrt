@@ -61,6 +61,8 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-bg-item.active .bg-name { font-size: 6px; color: #555; }
 .shooter-bg-item.active .bg-vals { font-size: 7px; font-weight: 600; color: #444; }
 .shooter-bg-item:hover { opacity: 0.9; }
+.target-bg-count { cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #fef3c7; border: 1px solid #fbbf24; user-select: none; }
+.target-bg-count:hover { background: #fde68a; }
 .bg-presets { display: flex; gap: 2px; margin-left: 4px; }
 .bg-presets button { width: 18px; height: 18px; border: 1px solid #cbd5e1; background: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; padding: 0; }
 .bg-presets button:hover { background: #f1f5f9; }
@@ -105,7 +107,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Shooter drag-drop reorder, Brug short rank
+    🚀 Fix: add shortRank to baskin page
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -113,7 +115,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 22:47 OT</div>
+    <div class="update-time">🕐 28.01.2026 22:51 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -225,13 +227,29 @@ function renderBaskinList() {
                 bgs = newBgs;
                 s.bgs = newBgs;
             }
-            // Count active BGs
-            let bgCount = 0;
+            // Separate active and inactive, active first
+            const activeBgs = [];
+            const inactiveBgs = [];
             bgDefaults.forEach((info, i) => {
-                if (bgs[i] !== undefined && bgs[i] !== null) bgCount++;
+                const bg = bgs[i];
+                const isActive = bg !== undefined && bg !== null;
+                if (isActive) {
+                    // Color spectrum: ATK=red, DEF=blue, mix=purple
+                    const atkRatio = bg.atk / 10;
+                    const r = Math.round(220 * atkRatio + 37 * (1 - atkRatio));
+                    const g = Math.round(38 * atkRatio + 99 * (1 - atkRatio));
+                    const b = Math.round(38 * atkRatio + 235 * (1 - atkRatio));
+                    const bgColor = `rgba(${r},${g},${b},0.2)`;
+                    const borderColor = `rgba(${r},${g},${b},0.6)`;
+                    activeBgs.push(`<div class="shooter-bg-item active" style="background:${bgColor};border-color:${borderColor}" onclick="bgClick(event,${idx},${sIdx},${i})" oncontextmenu="disableBg(${idx},${sIdx},${i}); return false;" title="Click:cycle Shift/R:off">
+                        <span class="bg-name">${info.name}</span>
+                        <span class="bg-vals">${bg.atk}/${bg.def}</span>
+                    </div>`);
+                } else {
+                    inactiveBgs.push(`<div class="shooter-bg-item inactive" onclick="enableBg(${idx},${sIdx},${i})" title="${info.name} - Click to enable">${info.name}</div>`);
+                }
             });
-            // Simple BG count display - click to decrease, shift+click to increase
-            const bgsHtml = `<span class="shooter-bg-count" onclick="changeBgCount(event,${idx},${sIdx})" title="Click: -1 BG, Shift+Click: +1 BG">BG${bgCount}</span>`;
+            const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
             return `<div class="shooter-row" draggable="true" data-enemy="${idx}" data-shooter="${sIdx}" ondragstart="shooterDragStart(event)" ondragover="shooterDragOver(event)" ondrop="shooterDrop(event)" ondragend="shooterDragEnd(event)">
                 <span class="drag-handle">⋮⋮</span>
                 ${sPos}
@@ -252,13 +270,7 @@ function renderBaskinList() {
                         <span class="enemy-name">${e.Name}</span>
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-inline">
-                            <div class="stats-group bg">
-                                <button class="stat-btn bg ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')" title="1. Bodyguard">👤1</button>
-                                <button class="stat-btn bg ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')" title="2. Bodyguard">👤2</button>
-                                <button class="stat-btn bg ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')" title="3. Bodyguard">👤3</button>
-                                <button class="stat-btn bg ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')" title="4. Bodyguard">👤4</button>
-                                <button class="stat-btn bg ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')" title="5. Bodyguard">👤5</button>
-                            </div>
+                            <span class="target-bg-count" onclick="cycleTargetBg(${idx})" title="Click: -1 BG">👤${st.bgCount !== undefined ? st.bgCount : 5}</span>
                             <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">🛡️</button>
                             <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
                             <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
@@ -407,28 +419,11 @@ function enableBg(enemyIdx, shooterIdx, bgIdx) {
     renderBaskinList();
 }
 
-function changeBgCount(event, enemyIdx, shooterIdx) {
-    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
-    if (!shooter.bgs) shooter.bgs = {};
-    const activeKeys = Object.keys(shooter.bgs).map(k => parseInt(k)).sort((a,b) => a-b);
-    const count = activeKeys.length;
-    
-    if (event.shiftKey) {
-        // Increase: enable first inactive BG
-        if (count >= 5) return;
-        for (let i = 0; i < 6; i++) {
-            if (shooter.bgs[i] === undefined) {
-                const def = bgDefaults[i];
-                shooter.bgs[i] = { atk: def.atk, def: def.def };
-                break;
-            }
-        }
-    } else {
-        // Decrease: disable last active BG
-        if (count <= 0) return;
-        const lastKey = activeKeys[activeKeys.length - 1];
-        delete shooter.bgs[lastKey];
-    }
+function cycleTargetBg(enemyIdx) {
+    if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    const st = baskinList[enemyIdx].stats;
+    const current = st.bgCount !== undefined ? st.bgCount : 5;
+    st.bgCount = current <= 0 ? 5 : current - 1;
     saveState();
     renderBaskinList();
 }
