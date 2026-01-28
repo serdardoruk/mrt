@@ -33,17 +33,13 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .enemy-info { flex: 1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .enemy-name { font-weight: 700; font-size: 15px; color: #0f172a; }
 .enemy-meta { color: #64748b; font-size: 12px; }
-.stats-inline { display: flex; gap: 4px; margin-left: 8px; }
+.stats-inline { display: flex; gap: 4px; margin-left: 8px; align-items: center; }
 .stats-group { display: flex; gap: 2px; padding: 2px 4px; border-radius: 4px; background: rgba(0,0,0,0.03); }
 .stats-group.bg { border-left: 2px solid #f59e0b; }
-.stat-btn { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
-.stat-btn.active { color: #fff; }
-.stat-btn.inactive { background: #e2e8f0 !important; color: #94a3b8; text-decoration: line-through; }
-.stat-btn.bg.active { background: #f59e0b; }
-.stat-btn.suit.active { background: #3b82f6; }
-.stat-btn.blood.active { background: #ef4444; }
-.stat-btn.sh.active { background: #8b5cf6; }
-.stat-btn.travel.active { background: #06b6d4; }
+.stat-btn { padding: 4px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; background: #fff; }
+.stat-btn.active { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.2); }
+.stat-btn.inactive { opacity: 0.35; filter: grayscale(100%); background: #f1f5f9; }
+.stat-btn.inactive:hover { opacity: 0.6; }
 .city-select { padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; cursor: pointer; }
 .city-select:focus { outline: none; border-color: #2563eb; }
 .shooter-section { display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #22c55e; margin-left: 8px; }
@@ -92,7 +88,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 20:06 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:07 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
