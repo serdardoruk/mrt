@@ -107,7 +107,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG: each has own ATK/DEF, preset buttons for all at once
+    🚀 Fix: handle old BG array format migration
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -115,7 +115,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:52 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:57 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -214,7 +214,7 @@ function renderBaskinList() {
                 if (!isActive) {
                     return `<div class="shooter-bg-item inactive" onclick="enableBg(${idx},${sIdx},${i})" title="${info.name} - Click to enable">${info.name}</div>`;
                 }
-                return `<div class="shooter-bg-item active" onclick="cycleBg(${idx},${sIdx},${i})" oncontextmenu="disableBg(${idx},${sIdx},${i}); return false;" title="L:cycle R:off">
+                return `<div class="shooter-bg-item active" onclick="bgClick(event,${idx},${sIdx},${i})" oncontextmenu="disableBg(${idx},${sIdx},${i}); return false;" title="Click:cycle Shift/R:off">
                     <span class="bg-name">${info.name}</span>
                     <span class="bg-vals"><span class="bg-atk">${bg.atk}</span>/<span class="bg-def">${bg.def}</span></span>
                 </div>`;
@@ -377,6 +377,15 @@ function disableBg(enemyIdx, shooterIdx, bgIdx) {
     }
     saveState();
     renderBaskinList();
+}
+
+function bgClick(event, enemyIdx, shooterIdx, bgIdx) {
+    // Shift+click = disable
+    if (event.shiftKey) {
+        disableBg(enemyIdx, shooterIdx, bgIdx);
+        return;
+    }
+    cycleBg(enemyIdx, shooterIdx, bgIdx);
 }
 
 function cycleBg(enemyIdx, shooterIdx, bgIdx) {
