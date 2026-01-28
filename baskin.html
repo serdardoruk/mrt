@@ -71,11 +71,15 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 18:21 OT</div>
+    <div class="update-time">🕐 28.01.2026 18:23 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
-            <input type="text" class="search-box" id="enemySearch" placeholder="Düşman ara ve ekle...">
+            <input type="text" class="search-box" id="familySearch" placeholder="🏠 Aile ara (tüm üyeler eklenir)...">
+            <div class="player-dropdown" id="familyDropdown"></div>
+        </div>
+        <div class="search-wrap">
+            <input type="text" class="search-box" id="enemySearch" placeholder="👤 Kişi ara ve ekle...">
             <div class="player-dropdown" id="enemyDropdown"></div>
         </div>
         <button class="copy-btn" onclick="copyBaskinList()">📋 Listeyi Kopyala</button>
@@ -161,6 +165,24 @@ function addEnemy(player) {
     renderBaskinList();
     document.getElementById('enemySearch').value = '';
     document.getElementById('enemyDropdown').classList.remove('show');
+}
+
+function addFamily(familyName) {
+    const members = allPlayers.filter(p => p.Family === familyName)
+        .sort((a, b) => (a.Pos || 9999) - (b.Pos || 9999));
+    let addedCount = 0;
+    members.forEach(player => {
+        if (!baskinList.some(b => b.enemy.Name === player.Name)) {
+            baskinList.push({ enemy: player, shooters: [] });
+            addedCount++;
+        }
+    });
+    renderBaskinList();
+    document.getElementById('familySearch').value = '';
+    document.getElementById('familyDropdown').classList.remove('show');
+    if (addedCount > 0) {
+        alert(`${familyName} ailesinden ${addedCount} kişi eklendi!`);
+    }
 }
 
 function removeEnemy(idx) {
@@ -251,6 +273,31 @@ function copyBaskinList() {
     navigator.clipboard.writeText(text).then(() => alert('Kopyalandı!'));
 }
 
+// Family search
+const familySearch = document.getElementById('familySearch');
+const familyDropdown = document.getElementById('familyDropdown');
+const allFamilies = [...new Set(allPlayers.map(p => p.Family).filter(f => f && f !== '-'))].sort();
+
+familySearch.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    if (q.length < 1) {
+        familyDropdown.classList.remove('show');
+        return;
+    }
+    
+    const filtered = allFamilies.filter(f => f.toLowerCase().includes(q)).slice(0, 15);
+    
+    familyDropdown.innerHTML = filtered.map(fam => {
+        const count = allPlayers.filter(p => p.Family === fam).length;
+        return `<div class="player-option" onclick="addFamily('${fam}')">
+            <strong>🏠 ${fam}</strong>
+            <span style="color:#94a3b8">(${count} üye)</span>
+        </div>`;
+    }).join('');
+    
+    familyDropdown.classList.add('show');
+});
+
 // Enemy search
 const enemySearch = document.getElementById('enemySearch');
 const enemyDropdown = document.getElementById('enemyDropdown');
@@ -288,6 +335,7 @@ document.getElementById('shooterModal').addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-wrap')) {
         enemyDropdown.classList.remove('show');
+        familyDropdown.classList.remove('show');
     }
 });
 
