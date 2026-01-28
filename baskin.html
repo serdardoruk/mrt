@@ -6,58 +6,58 @@
 <script>if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #0f172a, #1e293b); min-height: 100vh; color: #f8fafc; padding: 20px; margin-top: 60px; }
-.top-nav { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.3); padding: 0 16px; }
-.top-nav a { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; text-decoration: none; color: #94a3b8; font-weight: 600; font-size: 13px; transition: all 0.2s; }
-.top-nav a:hover { background: rgba(255,255,255,0.1); color: #f8fafc; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f6f8fc, #eef2f7); min-height: 100vh; color: #0f172a; padding: 20px; margin-top: 60px; }
+.top-nav { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #0f172a; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.3); padding: 0 16px; }
+.top-nav a { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; text-decoration: none; color: #94a3b8; font-weight: 600; font-size: 13px; transition: all 0.2s; background: #1e293b; }
+.top-nav a:hover { background: rgba(255,255,255,0.15); color: #f8fafc; }
 .top-nav a.active { background: #2563eb; color: #fff; }
 .logout-btn { position: absolute !important; right: 12px; }
 .page { max-width: 1000px; margin: 0 auto; }
 h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .update-time { text-align: center; color: #64748b; font-size: 12px; margin-bottom: 20px; }
 .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-.search-box { padding: 10px 14px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #f8fafc; font-size: 14px; width: 250px; }
+.search-box { padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; font-size: 14px; width: 250px; }
 .search-box:focus { outline: none; border-color: #2563eb; }
 .add-btn { padding: 10px 20px; border-radius: 8px; border: none; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
 .add-btn:hover { background: #1d4ed8; }
-.player-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid #334155; border-radius: 8px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; }
+.player-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
 .player-dropdown.show { display: block; }
-.player-option { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
-.player-option:hover { background: #334155; }
+.player-option { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
+.player-option:hover { background: #f1f5f9; }
 .player-option:last-child { border-bottom: none; }
 .search-wrap { position: relative; }
-.baskin-list { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; }
-.baskin-item { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.08); border-radius: 8px; margin-bottom: 10px; }
+.baskin-list { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.baskin-item { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
 .baskin-item:last-child { margin-bottom: 0; }
 .baskin-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .enemy-info { flex: 1; display: flex; align-items: center; gap: 8px; }
-.enemy-name { font-weight: 700; font-size: 15px; }
-.enemy-meta { color: #94a3b8; font-size: 12px; }
+.enemy-name { font-weight: 700; font-size: 15px; color: #0f172a; }
+.enemy-meta { color: #64748b; font-size: 12px; }
 .shooter-section { display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #22c55e; margin-left: 8px; }
-.shooter-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(34,197,94,0.15); border-radius: 4px; }
-.shooter-pos { font-weight: 700; font-size: 12px; }
-.shooter-name { font-weight: 600; color: #22c55e; }
-.shooter-meta { color: #94a3b8; font-size: 11px; }
+.shooter-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(34,197,94,0.1); border-radius: 4px; }
+.shooter-pos { font-weight: 700; font-size: 12px; color: #0f172a; }
+.shooter-name { font-weight: 600; color: #16a34a; }
+.shooter-meta { color: #64748b; font-size: 11px; }
 .shooter-remove { cursor: pointer; color: #ef4444; font-size: 14px; margin-left: auto; opacity: 0.7; }
 .shooter-remove:hover { opacity: 1; }
-.add-shooter-btn { padding: 6px 12px; border-radius: 6px; border: 1px dashed #475569; background: transparent; color: #94a3b8; cursor: pointer; font-size: 12px; align-self: flex-start; }
+.add-shooter-btn { padding: 6px 12px; border-radius: 6px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 12px; align-self: flex-start; }
 .add-shooter-btn:hover { border-color: #2563eb; color: #2563eb; }
 .remove-enemy { color: #ef4444; cursor: pointer; font-size: 18px; opacity: 0.6; }
 .remove-enemy:hover { opacity: 1; }
 .empty-state { text-align: center; padding: 40px; color: #64748b; }
 .pos-badge { padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 12px; }
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: none; align-items: center; justify-content: center; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; }
 .modal-overlay.show { display: flex; }
-.modal { background: #1e293b; border-radius: 12px; padding: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
-.modal h3 { margin-bottom: 16px; }
-.modal-search { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; margin-bottom: 12px; }
+.modal { background: #fff; border-radius: 12px; padding: 20px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid #e2e8f0; }
+.modal h3 { margin-bottom: 16px; color: #0f172a; }
+.modal-search { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; margin-bottom: 12px; }
 .modal-list { max-height: 300px; overflow-y: auto; }
 .modal-item { padding: 10px; cursor: pointer; border-radius: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-.modal-item:hover { background: #334155; }
+.modal-item:hover { background: #f1f5f9; }
 .save-btn { position: fixed; bottom: 20px; right: 20px; padding: 14px 28px; border-radius: 12px; border: none; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: 0 8px 24px rgba(34,197,94,0.4); }
 .save-btn:hover { transform: translateY(-2px); }
-.copy-btn { padding: 10px 20px; border-radius: 8px; border: none; background: #475569; color: #fff; font-weight: 600; cursor: pointer; }
-.copy-btn:hover { background: #64748b; }
+.copy-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; font-weight: 600; cursor: pointer; }
+.copy-btn:hover { background: #f1f5f9; }
 @media (max-width: 768px) {
     body { margin-top: 0; padding-bottom: 70px; }
     .top-nav { top: auto; bottom: 0; height: 60px; }
@@ -75,7 +75,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 19:43 OT</div>
+    <div class="update-time">🕐 28.01.2026 19:45 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
