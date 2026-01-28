@@ -2,7 +2,7 @@
 <html><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baskın Planlayıcı</title>
+<title>Raid Planner</title>
 <script>if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -86,30 +86,30 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 </head>
 <body>
 <nav class="top-nav">
-    <a href="matchings_latest.html"><span>⚔️</span><span>Savaş</span></a>
-    <a href="baskin.html" class="active"><span>🎯</span><span>Baskın</span></a>
-    <a href="family_roster_latest.html"><span>👥</span><span>Aileler</span></a>
-    <a href="#" class="logout-btn" onclick="sessionStorage.removeItem('omerta_user');window.location.href='index.html';return false;"><span>🚪</span><span>Çıkış</span></a>
+    <a href="matchings_latest.html"><span>⚔️</span><span>War</span></a>
+    <a href="baskin.html" class="active"><span>🎯</span><span>Raid</span></a>
+    <a href="family_roster_latest.html"><span>👥</span><span>Families</span></a>
+    <a href="#" class="logout-btn" onclick="sessionStorage.removeItem('omerta_user');window.location.href='index.html';return false;"><span>🚪</span><span>Logout</span></a>
 </nav>
 
 <div class="page">
-    <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 20:18 OT</div>
+    <h1>🎯 Raid Planner</h1>
+    <div class="update-time">🕐 28.01.2026 20:24 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
-            <input type="text" class="search-box" id="familySearch" placeholder="🏠 Aile ara (tüm üyeler eklenir)...">
+            <input type="text" class="search-box" id="familySearch" placeholder="🏠 Search family (adds all members)...">
             <div class="player-dropdown" id="familyDropdown"></div>
         </div>
         <div class="search-wrap">
-            <input type="text" class="search-box" id="enemySearch" placeholder="👤 Kişi ara ve ekle...">
+            <input type="text" class="search-box" id="enemySearch" placeholder="👤 Search player...">
             <div class="player-dropdown" id="enemyDropdown"></div>
         </div>
-        <button class="copy-btn" onclick="copyBaskinList()">📋 Listeyi Kopyala</button>
+        <button class="copy-btn" onclick="copyBaskinList()">📋 Copy List</button>
     </div>
     
     <div class="baskin-list" id="baskinList">
-        <div class="empty-state">Henüz düşman eklenmedi. Yukarıdan arayarak ekle.</div>
+        <div class="empty-state">No targets added yet. Search and add above.</div>
     </div>
 </div>
 
@@ -155,7 +155,7 @@ function posHtml(pos) {
 function renderBaskinList() {
     const container = document.getElementById('baskinList');
     if (!baskinList.length) {
-        container.innerHTML = '<div class="empty-state">Henüz düşman eklenmedi. Yukarıdan arayarak ekle.</div>';
+        container.innerHTML = '<div class="empty-state">No targets added yet. Search and add above.</div>';
         return;
     }
     
@@ -214,7 +214,7 @@ function renderBaskinList() {
                 <div class="city-row">
                     <span class="city-label">📍 Last Seen:</span>
                     <select class="city-select" onchange="updateCity(${idx},this.value)">
-                        <option value="" ${!st.city ? 'selected' : ''}>Seç...</option>
+                        <option value="" ${!st.city ? 'selected' : ''}>Select...</option>
                         <option value="Detroit" ${st.city==='Detroit' ? 'selected' : ''}>Detroit</option>
                         <option value="Chicago" ${st.city==='Chicago' ? 'selected' : ''}>Chicago</option>
                         <option value="New York" ${st.city==='New York' ? 'selected' : ''}>New York</option>
@@ -296,7 +296,7 @@ function addFamily(familyName) {
     document.getElementById('familySearch').value = '';
     document.getElementById('familyDropdown').classList.remove('show');
     if (addedCount > 0) {
-        alert(`${familyName} ailesinden ${addedCount} kişi eklendi!`);
+        alert(`${addedCount} members from ${familyName} added!`);
     }
 }
 
