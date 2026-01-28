@@ -103,7 +103,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:08 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:12 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -177,18 +177,18 @@ function renderBaskinList() {
             const isFirst = sIdx === 0;
             const isLast = sIdx === item.shooters.length - 1;
             const bgInfo = [
-                {name:'Vic', defAtk:100, defDef:0},
-                {name:'Lex', defAtk:50, defDef:0},
-                {name:'Joe', defAtk:37, defDef:38},
-                {name:'Ike', defAtk:35, defDef:48},
-                {name:'Ray', defAtk:0, defDef:60},
-                {name:'Lee', defAtk:0, defDef:150}
+                {name:'Vic', atkLvl:10, defLvl:0},
+                {name:'Lex', atkLvl:10, defLvl:0},
+                {name:'Joe', atkLvl:5, defLvl:5},
+                {name:'Ike', atkLvl:5, defLvl:5},
+                {name:'Ray', atkLvl:0, defLvl:10},
+                {name:'Lee', atkLvl:0, defLvl:10}
             ];
             const bgs = s.bgs || [null,null,null,null,null,null];
             const bgsHtml = bgInfo.map((info, i) => {
                 const isActive = bgs[i] === true;
                 const inactiveClass = isActive ? '' : 'inactive';
-                const display = isActive ? `<span class="shooter-bg-atk">${info.defAtk}</span>/<span class="shooter-bg-def">${info.defDef}</span>` : '-';
+                const display = isActive ? `<span class="shooter-bg-atk">${info.atkLvl}</span>/<span class="shooter-bg-def">${info.defLvl}</span>` : '-';
                 return `<div class="shooter-bg-item ${inactiveClass}" onclick="toggleBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} - Click to toggle">
                     <span class="shooter-bg-num">${info.name}</span>
                     <div class="shooter-bg-vals">${display}</div>
