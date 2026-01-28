@@ -33,13 +33,17 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .enemy-info { flex: 1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .enemy-name { font-weight: 700; font-size: 15px; color: #0f172a; }
 .enemy-meta { color: #64748b; font-size: 12px; }
-.stats-inline { display: flex; gap: 3px; margin-left: 8px; }
+.stats-inline { display: flex; gap: 4px; margin-left: 8px; }
 .stats-group { display: flex; gap: 2px; padding: 2px 4px; border-radius: 4px; background: rgba(0,0,0,0.03); }
 .stats-group.bg { border-left: 2px solid #f59e0b; }
-.stats-group.other { border-left: 2px solid #8b5cf6; }
-.stat-mini { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
-.stat-mini.active { background: #22c55e; color: #fff; }
-.stat-mini.inactive { background: #e2e8f0; color: #94a3b8; text-decoration: line-through; }
+.stat-btn { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
+.stat-btn.active { color: #fff; }
+.stat-btn.inactive { background: #e2e8f0 !important; color: #94a3b8; text-decoration: line-through; }
+.stat-btn.bg.active { background: #f59e0b; }
+.stat-btn.suit.active { background: #3b82f6; }
+.stat-btn.blood.active { background: #ef4444; }
+.stat-btn.sh.active { background: #8b5cf6; }
+.stat-btn.travel.active { background: #06b6d4; }
 .shooter-section { display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #22c55e; margin-left: 8px; }
 .shooter-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(34,197,94,0.1); border-radius: 4px; }
 .shooter-pos { font-weight: 700; font-size: 12px; color: #0f172a; }
@@ -86,7 +90,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 19:52 OT</div>
+    <div class="update-time">🕐 28.01.2026 19:54 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -180,17 +184,16 @@ function renderBaskinList() {
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-inline">
                             <div class="stats-group bg">
-                                <button class="stat-mini ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')" title="1. Bodyguard">1</button>
-                                <button class="stat-mini ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')" title="2. Bodyguard">2</button>
-                                <button class="stat-mini ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')" title="3. Bodyguard">3</button>
-                                <button class="stat-mini ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')" title="4. Bodyguard">4</button>
-                                <button class="stat-mini ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')" title="5. Bodyguard">5</button>
+                                <button class="stat-btn bg ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')" title="1. Bodyguard">1</button>
+                                <button class="stat-btn bg ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')" title="2. Bodyguard">2</button>
+                                <button class="stat-btn bg ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')" title="3. Bodyguard">3</button>
+                                <button class="stat-btn bg ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')" title="4. Bodyguard">4</button>
+                                <button class="stat-btn bg ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')" title="5. Bodyguard">5</button>
                             </div>
-                            <div class="stats-group other">
-                                <button class="stat-mini ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">S</button>
-                                <button class="stat-mini ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">B</button>
-                                <button class="stat-mini ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">H</button>
-                            </div>
+                            <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">Suit</button>
+                            <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">Blood</button>
+                            <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">SH</button>
+                            <button class="stat-btn travel ${st.travel !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'travel')" title="Travel">Travel</button>
                         </div>
                     </div>
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
