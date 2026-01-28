@@ -105,7 +105,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG short names: V X J I R L
+    🚀 Shooter drag-drop reorder, Brug short rank
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -113,7 +113,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 22:46 OT</div>
+    <div class="update-time">🕐 28.01.2026 22:47 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -148,6 +148,25 @@ const STORAGE_KEY = 'omerta_baskin_state';
 
 let baskinList = []; // { enemy: {...}, shooters: [{...}, ...] }
 let currentEnemyIdx = null;
+
+const RANK_SHORT = {
+    'Bruglione': 'Brug',
+    'Chief': 'Chief',
+    'Local Chief': 'LChief',
+    'Assassin': 'Assn',
+    'Swindler': 'Swind',
+    'Thief': 'Thief',
+    'Mobster': 'Mob',
+    'Soldier': 'Sold',
+    'Picciotto': 'Picc',
+    'Associate': 'Assoc',
+    'Pickpocket': 'Pick',
+    'Shoplifter': 'Shop',
+    'Empty-suit': 'Empty',
+    'Delivery Boy': 'DBoy',
+    'Delivery Girl': 'DGirl'
+};
+function shortRank(r) { return RANK_SHORT[r] || r; }
 
 function getPosTier(pos) {
     const n = Number(pos);
