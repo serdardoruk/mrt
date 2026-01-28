@@ -90,7 +90,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 19:54 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:05 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -184,16 +184,16 @@ function renderBaskinList() {
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-inline">
                             <div class="stats-group bg">
-                                <button class="stat-btn bg ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')" title="1. Bodyguard">1</button>
-                                <button class="stat-btn bg ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')" title="2. Bodyguard">2</button>
-                                <button class="stat-btn bg ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')" title="3. Bodyguard">3</button>
-                                <button class="stat-btn bg ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')" title="4. Bodyguard">4</button>
-                                <button class="stat-btn bg ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')" title="5. Bodyguard">5</button>
+                                <button class="stat-btn bg ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')" title="1. Bodyguard">👤1</button>
+                                <button class="stat-btn bg ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')" title="2. Bodyguard">👤2</button>
+                                <button class="stat-btn bg ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')" title="3. Bodyguard">👤3</button>
+                                <button class="stat-btn bg ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')" title="4. Bodyguard">👤4</button>
+                                <button class="stat-btn bg ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')" title="5. Bodyguard">👤5</button>
                             </div>
-                            <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">Suit</button>
-                            <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">Blood</button>
-                            <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">SH</button>
-                            <button class="stat-btn travel ${st.travel !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'travel')" title="Travel">Travel</button>
+                            <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">🛡️</button>
+                            <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
+                            <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
+                            <button class="stat-btn travel ${st.travel !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'travel')" title="Travel">✈️</button>
                         </div>
                     </div>
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
