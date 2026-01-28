@@ -63,6 +63,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-bg-item:hover { opacity: 0.9; }
 .target-bg-count { cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #fef3c7; border: 1px solid #fbbf24; user-select: none; }
 .target-bg-count:hover { background: #fde68a; }
+.target-bg-count.has-dead { background: #fee2e2; border-color: #f87171; color: #dc2626; }
 .bg-presets { display: flex; gap: 2px; margin-left: 4px; }
 .bg-presets button { width: 18px; height: 18px; border: 1px solid #cbd5e1; background: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; padding: 0; }
 .bg-presets button:hover { background: #f1f5f9; }
@@ -107,7 +108,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Fix: add shortRank to baskin page
+    🚀 Shooter BG individual, Target BG single counter
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -115,7 +116,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 22:51 OT</div>
+    <div class="update-time">🕐 28.01.2026 22:52 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -270,7 +271,7 @@ function renderBaskinList() {
                         <span class="enemy-name">${e.Name}</span>
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-inline">
-                            <span class="target-bg-count" onclick="cycleTargetBg(${idx})" title="Click: -1 BG">👤${st.bgCount !== undefined ? st.bgCount : 5}</span>
+                            <span class="target-bg-count ${(st.bgDead || 0) > 0 ? 'has-dead' : ''}" onclick="cycleTargetBg(${idx})" title="Click: +1 dead BG">👤${(st.bgDead || 0) > 0 ? '-' + st.bgDead : '5'}</span>
                             <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">🛡️</button>
                             <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
                             <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
@@ -422,8 +423,8 @@ function enableBg(enemyIdx, shooterIdx, bgIdx) {
 function cycleTargetBg(enemyIdx) {
     if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
     const st = baskinList[enemyIdx].stats;
-    const current = st.bgCount !== undefined ? st.bgCount : 5;
-    st.bgCount = current <= 0 ? 5 : current - 1;
+    const current = st.bgDead || 0;
+    st.bgDead = current >= 5 ? 0 : current + 1;
     saveState();
     renderBaskinList();
 }
