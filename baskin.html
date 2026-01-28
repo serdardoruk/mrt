@@ -104,7 +104,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG: Shift+click to disable (alternative to right-click)
+    🚀 BG: active first, inactive right; color spectrum red(ATK)→blue(DEF)
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -112,7 +112,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 22:11 OT</div>
+    <div class="update-time">🕐 28.01.2026 22:16 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -228,19 +228,12 @@ function renderBaskinList() {
                 }
             });
             const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
-            const activeBgCount = Object.keys(bgs).length;
-            const presetBtns = activeBgCount > 0 ? `<div class="bg-presets">
-                <button onclick="presetBgs(${idx},${sIdx},'atk')" title="All ATK">⚔️</button>
-                <button onclick="presetBgs(${idx},${sIdx},'bal')" title="Balanced">⚖️</button>
-                <button onclick="presetBgs(${idx},${sIdx},'def')" title="All DEF">🛡️</button>
-            </div>` : '';
             return `<div class="shooter-row">
                 ${sPos}
                 <span class="shooter-name">${s.Name}</span>
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
                 <div class="shooter-bg">
                     ${bgsHtml}
-                    ${presetBtns}
                 </div>
                 <div class="shooter-order">
                     <button onclick="moveShooter(${idx}, ${sIdx}, -1)" ${isFirst ? 'disabled' : ''}>▲</button>
