@@ -47,10 +47,9 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .add-shooter-btn { padding: 6px 12px; border-radius: 6px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 12px; }
 .add-shooter-btn:hover { border-color: #2563eb; color: #2563eb; }
 .stats-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
-.stat-item { display: flex; align-items: center; gap: 4px; }
-.stat-label { font-size: 11px; color: #64748b; font-weight: 600; }
-.stat-input { width: 40px; padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; text-align: center; }
-.stat-input:focus { outline: none; border-color: #2563eb; }
+.stat-toggle { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
+.stat-toggle.active { background: #22c55e; color: #fff; }
+.stat-toggle.inactive { background: #e2e8f0; color: #94a3b8; text-decoration: line-through; }
 .remove-enemy { color: #ef4444; cursor: pointer; font-size: 18px; opacity: 0.6; }
 .remove-enemy:hover { opacity: 1; }
 .empty-state { text-align: center; padding: 40px; color: #64748b; }
@@ -84,7 +83,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 19:46 OT</div>
+    <div class="update-time">🕐 28.01.2026 19:49 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -181,14 +180,14 @@ function renderBaskinList() {
                     <span class="remove-enemy" onclick="removeEnemy(${idx})">×</span>
                 </div>
                 <div class="stats-row">
-                    <div class="stat-item"><span class="stat-label">1.BG</span><input type="text" class="stat-input" value="${st.bg1||''}" onchange="updateStat(${idx},'bg1',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">2.BG</span><input type="text" class="stat-input" value="${st.bg2||''}" onchange="updateStat(${idx},'bg2',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">3.BG</span><input type="text" class="stat-input" value="${st.bg3||''}" onchange="updateStat(${idx},'bg3',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">4.BG</span><input type="text" class="stat-input" value="${st.bg4||''}" onchange="updateStat(${idx},'bg4',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">5.BG</span><input type="text" class="stat-input" value="${st.bg5||''}" onchange="updateStat(${idx},'bg5',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">Suit</span><input type="text" class="stat-input" value="${st.suit||''}" onchange="updateStat(${idx},'suit',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">Blood</span><input type="text" class="stat-input" value="${st.blood||''}" onchange="updateStat(${idx},'blood',this.value)"></div>
-                    <div class="stat-item"><span class="stat-label">SH</span><input type="text" class="stat-input" value="${st.sh||''}" onchange="updateStat(${idx},'sh',this.value)"></div>
+                    <button class="stat-toggle ${st.bg1 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg1')">1.BG</button>
+                    <button class="stat-toggle ${st.bg2 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg2')">2.BG</button>
+                    <button class="stat-toggle ${st.bg3 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg3')">3.BG</button>
+                    <button class="stat-toggle ${st.bg4 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg4')">4.BG</button>
+                    <button class="stat-toggle ${st.bg5 !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'bg5')">5.BG</button>
+                    <button class="stat-toggle ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')">Suit</button>
+                    <button class="stat-toggle ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')">Blood</button>
+                    <button class="stat-toggle ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')">SH</button>
                 </div>
                 ${shootersHtml ? `<div class="shooter-section">${shootersHtml}</div>` : ''}
             </div>
@@ -209,6 +208,14 @@ function updateStat(enemyIdx, statKey, value) {
     if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
     baskinList[enemyIdx].stats[statKey] = value;
     saveState();
+}
+
+function toggleStat(enemyIdx, statKey) {
+    if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    const current = baskinList[enemyIdx].stats[statKey];
+    baskinList[enemyIdx].stats[statKey] = current === false ? true : false;
+    saveState();
+    renderBaskinList();
 }
 
 function addEnemy(player) {
