@@ -44,6 +44,8 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .stat-btn.blood.active { background: #ef4444; }
 .stat-btn.sh.active { background: #8b5cf6; }
 .stat-btn.travel.active { background: #06b6d4; }
+.city-select { padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; cursor: pointer; }
+.city-select:focus { outline: none; border-color: #2563eb; }
 .shooter-section { display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #22c55e; margin-left: 8px; }
 .shooter-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(34,197,94,0.1); border-radius: 4px; }
 .shooter-pos { font-weight: 700; font-size: 12px; color: #0f172a; }
@@ -90,7 +92,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 20:05 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:06 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -194,6 +196,14 @@ function renderBaskinList() {
                             <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
                             <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
                             <button class="stat-btn travel ${st.travel !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'travel')" title="Travel">✈️</button>
+                            <select class="city-select" onchange="updateCity(${idx},this.value)" title="Last Seen City">
+                                <option value="" ${!st.city ? 'selected' : ''}>-</option>
+                                <option value="Detroit" ${st.city==='Detroit' ? 'selected' : ''}>Detroit</option>
+                                <option value="Chicago" ${st.city==='Chicago' ? 'selected' : ''}>Chicago</option>
+                                <option value="New York" ${st.city==='New York' ? 'selected' : ''}>New York</option>
+                                <option value="Las Vegas" ${st.city==='Las Vegas' ? 'selected' : ''}>Las Vegas</option>
+                                <option value="Philadelphia" ${st.city==='Philadelphia' ? 'selected' : ''}>Philadelphia</option>
+                            </select>
                         </div>
                     </div>
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
@@ -226,6 +236,12 @@ function toggleStat(enemyIdx, statKey) {
     baskinList[enemyIdx].stats[statKey] = current === false ? true : false;
     saveState();
     renderBaskinList();
+}
+
+function updateCity(enemyIdx, city) {
+    if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    baskinList[enemyIdx].stats.city = city;
+    saveState();
 }
 
 function addEnemy(player) {
