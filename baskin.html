@@ -105,7 +105,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:31 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:35 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -188,8 +188,12 @@ function renderBaskinList() {
             ];
             const bgs = s.bgs || [null,null,null,null,null,null];
             const bgsHtml = bgDefaults.map((info, i) => {
-                const bg = bgs[i];
-                const isActive = bg && (bg.atk > 0 || bg.def > 0);
+                let bg = bgs[i];
+                // Handle old formats (true, 'atk', 'def')
+                if (bg === true || bg === 'atk' || bg === 'def' || (typeof bg === 'object' && bg !== null && bg.atkLvl !== undefined)) {
+                    bg = null; // Reset old format
+                }
+                const isActive = bg && typeof bg === 'object' && (bg.atk > 0 || bg.def > 0);
                 if (!isActive) {
                     return `<div class="shooter-bg-item inactive" onclick="clickBg(event,${idx},${sIdx},${i})" oncontextmenu="clickBg(event,${idx},${sIdx},${i}); return false;" title="${info.name} - L:ATK R:DEF">${info.name}</div>`;
                 }
@@ -333,6 +337,12 @@ function clickBg(event, enemyIdx, shooterIdx, bgIdx) {
     if (!shooter.bgs) shooter.bgs = [null,null,null,null,null,null];
     let bg = shooter.bgs[bgIdx];
     const isRight = event.button === 2;
+    
+    // Handle old formats
+    if (bg === true || bg === 'atk' || bg === 'def' || (typeof bg === 'object' && bg !== null && bg.atkLvl !== undefined)) {
+        bg = null;
+        shooter.bgs[bgIdx] = null;
+    }
     
     if (!bg || (bg.atk === 0 && bg.def === 0)) {
         // Inactive - activate with defaults
