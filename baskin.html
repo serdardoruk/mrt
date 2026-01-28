@@ -38,10 +38,19 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .shooter-pos { font-weight: 700; font-size: 12px; color: #0f172a; }
 .shooter-name { font-weight: 600; color: #16a34a; }
 .shooter-meta { color: #64748b; font-size: 11px; }
-.shooter-remove { cursor: pointer; color: #ef4444; font-size: 14px; margin-left: auto; opacity: 0.7; }
+.shooter-order { display: flex; flex-direction: column; gap: 2px; margin-left: auto; }
+.shooter-order button { width: 20px; height: 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; line-height: 1; }
+.shooter-order button:hover { background: #e2e8f0; }
+.shooter-order button:disabled { opacity: 0.3; cursor: default; }
+.shooter-remove { cursor: pointer; color: #ef4444; font-size: 14px; opacity: 0.7; }
 .shooter-remove:hover { opacity: 1; }
-.add-shooter-btn { padding: 6px 12px; border-radius: 6px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 12px; align-self: flex-start; }
+.add-shooter-btn { padding: 6px 12px; border-radius: 6px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 12px; }
 .add-shooter-btn:hover { border-color: #2563eb; color: #2563eb; }
+.stats-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+.stat-item { display: flex; align-items: center; gap: 4px; }
+.stat-label { font-size: 11px; color: #64748b; font-weight: 600; }
+.stat-input { width: 40px; padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; text-align: center; }
+.stat-input:focus { outline: none; border-color: #2563eb; }
 .remove-enemy { color: #ef4444; cursor: pointer; font-size: 18px; opacity: 0.6; }
 .remove-enemy:hover { opacity: 1; }
 .empty-state { text-align: center; padding: 40px; color: #64748b; }
@@ -75,7 +84,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 19:45 OT</div>
+    <div class="update-time">🕐 28.01.2026 19:46 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -142,13 +151,20 @@ function renderBaskinList() {
     
     container.innerHTML = baskinList.map((item, idx) => {
         const e = item.enemy;
+        const st = item.stats || {};
         const shootersHtml = item.shooters.length ? item.shooters.map((s, sIdx) => {
             const sPos = s.Pos && s.Pos < 9000 ? `<span class="shooter-pos">#${s.Pos}</span>` : '';
             const sRank = s.Rank ? `${s.Rank}` : '';
+            const isFirst = sIdx === 0;
+            const isLast = sIdx === item.shooters.length - 1;
             return `<div class="shooter-row">
                 ${sPos}
                 <span class="shooter-name">${s.Name}</span>
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
+                <div class="shooter-order">
+                    <button onclick="moveShooter(${idx}, ${sIdx}, -1)" ${isFirst ? 'disabled' : ''}>▲</button>
+                    <button onclick="moveShooter(${idx}, ${sIdx}, 1)" ${isLast ? 'disabled' : ''}>▼</button>
+                </div>
                 <span class="shooter-remove" onclick="removeShooter(${idx}, ${sIdx})">×</span>
             </div>`;
         }).join('') : '';
@@ -164,10 +180,35 @@ function renderBaskinList() {
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
                     <span class="remove-enemy" onclick="removeEnemy(${idx})">×</span>
                 </div>
+                <div class="stats-row">
+                    <div class="stat-item"><span class="stat-label">1.BG</span><input type="text" class="stat-input" value="${st.bg1||''}" onchange="updateStat(${idx},'bg1',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">2.BG</span><input type="text" class="stat-input" value="${st.bg2||''}" onchange="updateStat(${idx},'bg2',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">3.BG</span><input type="text" class="stat-input" value="${st.bg3||''}" onchange="updateStat(${idx},'bg3',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">4.BG</span><input type="text" class="stat-input" value="${st.bg4||''}" onchange="updateStat(${idx},'bg4',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">5.BG</span><input type="text" class="stat-input" value="${st.bg5||''}" onchange="updateStat(${idx},'bg5',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">Suit</span><input type="text" class="stat-input" value="${st.suit||''}" onchange="updateStat(${idx},'suit',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">Blood</span><input type="text" class="stat-input" value="${st.blood||''}" onchange="updateStat(${idx},'blood',this.value)"></div>
+                    <div class="stat-item"><span class="stat-label">SH</span><input type="text" class="stat-input" value="${st.sh||''}" onchange="updateStat(${idx},'sh',this.value)"></div>
+                </div>
                 ${shootersHtml ? `<div class="shooter-section">${shootersHtml}</div>` : ''}
             </div>
         `;
     }).join('');
+}
+
+function moveShooter(enemyIdx, shooterIdx, direction) {
+    const newIdx = shooterIdx + direction;
+    const shooters = baskinList[enemyIdx].shooters;
+    if (newIdx < 0 || newIdx >= shooters.length) return;
+    [shooters[shooterIdx], shooters[newIdx]] = [shooters[newIdx], shooters[shooterIdx]];
+    saveState();
+    renderBaskinList();
+}
+
+function updateStat(enemyIdx, statKey, value) {
+    if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    baskinList[enemyIdx].stats[statKey] = value;
+    saveState();
 }
 
 function addEnemy(player) {
