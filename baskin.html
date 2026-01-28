@@ -103,7 +103,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 20:56 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:03 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -176,17 +176,24 @@ function renderBaskinList() {
             const sRank = s.Rank ? `${s.Rank}` : '';
             const isFirst = sIdx === 0;
             const isLast = sIdx === item.shooters.length - 1;
-            const bgNames = ['Vic','Lex','Ike','Joe','Lee','Ray'];
+            const bgInfo = [
+                {name:'Vic', maxAtk:100, maxDef:30},
+                {name:'Lex', maxAtk:50, maxDef:30},
+                {name:'Joe', maxAtk:75, maxDef:75},
+                {name:'Ike', maxAtk:70, maxDef:95},
+                {name:'Ray', maxAtk:20, maxDef:60},
+                {name:'Lee', maxAtk:10, maxDef:150}
+            ];
             const bgs = s.bgs || [{},{},{},{},{},{}];
-            const bgsHtml = bgNames.map((name, i) => {
+            const bgsHtml = bgInfo.map((info, i) => {
                 const bg = bgs[i] || {};
                 const atk = bg.atk || 0;
                 const def = bg.def || 0;
                 const isActive = atk > 0 || def > 0;
                 const inactiveClass = isActive ? '' : 'inactive';
                 const display = isActive ? `<span class="shooter-bg-atk">${atk}</span>/<span class="shooter-bg-def">${def}</span>` : '-';
-                return `<div class="shooter-bg-item ${inactiveClass}" onclick="editShooterBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${name} - Click to edit">
-                    <span class="shooter-bg-num">${name}</span>
+                return `<div class="shooter-bg-item ${inactiveClass}" onclick="editShooterBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} (Max: ${info.maxAtk}/${info.maxDef}) - Click to edit">
+                    <span class="shooter-bg-num">${info.name}</span>
                     <div class="shooter-bg-vals">${display}</div>
                 </div>`;
             }).join('');
@@ -312,13 +319,24 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
 }
 
 function editShooterBg(enemyIdx, shooterIdx, bgIdx) {
-    const bgNames = ['Vic','Lex','Ike','Joe','Lee','Ray'];
+    const bgInfo = [
+        {name:'Vic', maxAtk:100, maxDef:30},
+        {name:'Lex', maxAtk:50, maxDef:30},
+        {name:'Joe', maxAtk:75, maxDef:75},
+        {name:'Ike', maxAtk:70, maxDef:95},
+        {name:'Ray', maxAtk:20, maxDef:60},
+        {name:'Lee', maxAtk:10, maxDef:150}
+    ];
+    const info = bgInfo[bgIdx];
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.bgs) shooter.bgs = [{},{},{},{},{},{}];
     const bg = shooter.bgs[bgIdx] || {};
     const currentAtk = bg.atk || 0;
     const currentDef = bg.def || 0;
-    const input = prompt(`${bgNames[bgIdx]} - Enter ATK/DEF (e.g. 50/75):`, `${currentAtk}/${currentDef}`);
+    const input = prompt(`${info.name}
+Max ATK: ${info.maxAtk} | Max DEF: ${info.maxDef}
+
+Enter ATK/DEF levels:`, `${currentAtk}/${currentDef}`);
     if (input) {
         const parts = input.split('/');
         if (parts.length === 2) {
