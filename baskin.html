@@ -50,8 +50,9 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 .shooter-name { font-weight: 600; color: #16a34a; }
 .shooter-meta { color: #64748b; font-size: 11px; }
 .shooter-bg { display: flex; gap: 4px; align-items: center; }
-.shooter-bg select { padding: 2px 4px; border-radius: 4px; font-size: 10px; border: 1px solid #cbd5e1; background: #fff; }
-.shooter-bg-label { font-size: 10px; color: #64748b; }
+.shooter-bg input { width: 35px; padding: 2px 4px; border-radius: 4px; font-size: 11px; border: 1px solid #cbd5e1; background: #fff; text-align: center; }
+.shooter-bg input:focus { outline: none; border-color: #2563eb; }
+.shooter-bg-label { font-size: 12px; }
 .shooter-order { display: flex; flex-direction: column; gap: 2px; margin-left: auto; }
 .shooter-order button { width: 20px; height: 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; line-height: 1; }
 .shooter-order button:hover { background: #e2e8f0; }
@@ -93,7 +94,7 @@ h1 { text-align: center; margin-bottom: 20px; font-size: 24px; }
 
 <div class="page">
     <h1>🎯 Baskın Planlayıcı</h1>
-    <div class="update-time">🕐 28.01.2026 20:13 OT</div>
+    <div class="update-time">🕐 28.01.2026 20:18 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -174,23 +175,9 @@ function renderBaskinList() {
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
                 <div class="shooter-bg">
                     <span class="shooter-bg-label">⚔️</span>
-                    <select onchange="updateShooterBg(${idx},${sIdx},'atkBg',this.value)">
-                        <option value="0" ${atkBg==0?'selected':''}>0</option>
-                        <option value="1" ${atkBg==1?'selected':''}>1</option>
-                        <option value="2" ${atkBg==2?'selected':''}>2</option>
-                        <option value="3" ${atkBg==3?'selected':''}>3</option>
-                        <option value="4" ${atkBg==4?'selected':''}>4</option>
-                        <option value="5" ${atkBg==5?'selected':''}>5</option>
-                    </select>
+                    <input type="text" value="${atkBg}" onchange="updateShooterAtk(${idx},${sIdx},this.value)" placeholder="Atk">
                     <span class="shooter-bg-label">🛡️</span>
-                    <select onchange="updateShooterBg(${idx},${sIdx},'defBg',this.value)">
-                        <option value="0" ${defBg==0?'selected':''}>0</option>
-                        <option value="1" ${defBg==1?'selected':''}>1</option>
-                        <option value="2" ${defBg==2?'selected':''}>2</option>
-                        <option value="3" ${defBg==3?'selected':''}>3</option>
-                        <option value="4" ${defBg==4?'selected':''}>4</option>
-                        <option value="5" ${defBg==5?'selected':''}>5</option>
-                    </select>
+                    <input type="text" value="${defBg}" readonly style="background:#f1f5f9;color:#64748b;">
                 </div>
                 <div class="shooter-order">
                     <button onclick="moveShooter(${idx}, ${sIdx}, -1)" ${isFirst ? 'disabled' : ''}>▲</button>
@@ -274,8 +261,17 @@ function updateCity(enemyIdx, city) {
 }
 
 function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
-    baskinList[enemyIdx].shooters[shooterIdx][bgType] = parseInt(value);
+    baskinList[enemyIdx].shooters[shooterIdx][bgType] = parseFloat(value) || 0;
     saveState();
+}
+
+function updateShooterAtk(enemyIdx, shooterIdx, value) {
+    const atk = parseFloat(value) || 0;
+    const def = Math.max(0, 5 - atk);
+    baskinList[enemyIdx].shooters[shooterIdx].atkBg = atk;
+    baskinList[enemyIdx].shooters[shooterIdx].defBg = parseFloat(def.toFixed(1));
+    saveState();
+    renderBaskinList();
 }
 
 function addEnemy(player) {
