@@ -54,13 +54,17 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-pos { font-weight: 700; font-size: 10px; color: #0f172a; }
 .shooter-name { font-weight: 600; color: #16a34a; font-size: 11px; }
 .shooter-meta { color: #64748b; font-size: 9px; }
-.shooter-bg { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
-.shooter-bg-item { display: flex; flex-direction: column; align-items: center; padding: 1px 3px; background: rgba(34,197,94,0.15); border-radius: 2px; font-size: 8px; border: 1px solid rgba(34,197,94,0.3); }
-.shooter-bg-item.inactive { background: rgba(0,0,0,0.03); border: 1px dashed #cbd5e1; opacity: 0.4; }
-.shooter-bg-num { font-weight: 700; font-size: 9px; }
-.shooter-bg-vals { display: flex; gap: 1px; font-size: 7px; }
-.shooter-bg-atk { color: #dc2626; font-weight: 600; }
-.shooter-bg-def { color: #2563eb; font-weight: 600; }
+.shooter-bg { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+.shooter-bg-item { display: flex; flex-direction: column; align-items: center; padding: 2px 4px; background: rgba(34,197,94,0.15); border-radius: 3px; font-size: 8px; border: 1px solid rgba(34,197,94,0.3); }
+.shooter-bg-item.inactive { background: rgba(0,0,0,0.03); border: 1px dashed #cbd5e1; opacity: 0.5; }
+.shooter-bg-num { font-weight: 700; font-size: 9px; cursor: pointer; }
+.shooter-bg-num:hover { text-decoration: underline; }
+.shooter-bg-row { display: flex; align-items: center; gap: 2px; margin-top: 1px; }
+.shooter-bg-lvl { font-weight: 700; min-width: 12px; text-align: center; }
+.shooter-bg-btn { width: 14px; height: 14px; border: 1px solid #ccc; background: #fff; border-radius: 2px; cursor: pointer; font-size: 10px; line-height: 1; padding: 0; }
+.shooter-bg-btn:hover { background: #e2e8f0; }
+.shooter-bg-btn.atk { color: #dc2626; }
+.shooter-bg-btn.def { color: #2563eb; }
 .shooter-bg-label { font-size: 9px; }
 .shooter-order { display: flex; flex-direction: column; gap: 1px; margin-left: auto; }
 .shooter-order button { width: 16px; height: 12px; border: 1px solid #cbd5e1; background: #fff; border-radius: 2px; cursor: pointer; font-size: 8px; line-height: 1; }
@@ -103,7 +107,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:20 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:23 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -191,10 +195,24 @@ function renderBaskinList() {
                 const inactiveClass = isActive ? '' : 'inactive';
                 const atkLvl = isActive ? (bg.atkLvl || 0) : 0;
                 const defLvl = isActive ? (bg.defLvl || 0) : 0;
-                const display = isActive ? `<span class="shooter-bg-atk">${atkLvl}</span>/<span class="shooter-bg-def">${defLvl}</span>` : '-';
-                return `<div class="shooter-bg-item ${inactiveClass}" onclick="toggleBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} - Click to ${isActive ? 'edit' : 'activate'}">
-                    <span class="shooter-bg-num">${info.name}</span>
-                    <div class="shooter-bg-vals">${display}</div>
+                if (!isActive) {
+                    return `<div class="shooter-bg-item inactive" onclick="activateBg(${idx},${sIdx},${i})" style="cursor:pointer" title="${info.name} - Click to activate">
+                        <span class="shooter-bg-num">${info.name}</span>
+                        <div class="shooter-bg-vals">-</div>
+                    </div>`;
+                }
+                return `<div class="shooter-bg-item">
+                    <span class="shooter-bg-num" onclick="deactivateBg(${idx},${sIdx},${i})" title="Click to remove">×${info.name}</span>
+                    <div class="shooter-bg-row">
+                        <button class="shooter-bg-btn atk" onclick="adjBg(${idx},${sIdx},${i},'atk',-1)">-</button>
+                        <span class="shooter-bg-lvl shooter-bg-atk">${atkLvl}</span>
+                        <button class="shooter-bg-btn atk" onclick="adjBg(${idx},${sIdx},${i},'atk',1)">+</button>
+                    </div>
+                    <div class="shooter-bg-row">
+                        <button class="shooter-bg-btn def" onclick="adjBg(${idx},${sIdx},${i},'def',-1)">-</button>
+                        <span class="shooter-bg-lvl shooter-bg-def">${defLvl}</span>
+                        <button class="shooter-bg-btn def" onclick="adjBg(${idx},${sIdx},${i},'def',1)">+</button>
+                    </div>
                 </div>`;
             }).join('');
             return `<div class="shooter-row">
@@ -318,7 +336,7 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     saveState();
 }
 
-function toggleBg(enemyIdx, shooterIdx, bgIdx) {
+function activateBg(enemyIdx, shooterIdx, bgIdx) {
     const bgDefaults = [
         {name:'Vic', atkLvl:10, defLvl:0},
         {name:'Lex', atkLvl:10, defLvl:0},
@@ -327,40 +345,35 @@ function toggleBg(enemyIdx, shooterIdx, bgIdx) {
         {name:'Ray', atkLvl:0, defLvl:10},
         {name:'Lee', atkLvl:0, defLvl:10}
     ];
-    const info = bgDefaults[bgIdx];
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.bgs) shooter.bgs = [null,null,null,null,null,null];
+    const activeCount = shooter.bgs.filter(b => b !== null && b !== undefined).length;
+    if (activeCount >= 5) {
+        alert('Max 5 BG!');
+        return;
+    }
+    const info = bgDefaults[bgIdx];
+    shooter.bgs[bgIdx] = { atkLvl: info.atkLvl, defLvl: info.defLvl };
+    saveState();
+    renderBaskinList();
+}
+
+function deactivateBg(enemyIdx, shooterIdx, bgIdx) {
+    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
+    if (!shooter.bgs) return;
+    shooter.bgs[bgIdx] = null;
+    saveState();
+    renderBaskinList();
+}
+
+function adjBg(enemyIdx, shooterIdx, bgIdx, type, delta) {
+    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
+    if (!shooter.bgs || !shooter.bgs[bgIdx]) return;
     const bg = shooter.bgs[bgIdx];
-    const isActive = bg !== null && bg !== undefined;
-    
-    if (isActive) {
-        // Already active - edit or deactivate
-        const currentAtk = bg.atkLvl || 0;
-        const currentDef = bg.defLvl || 0;
-        const input = prompt(`${info.name}
-ATK/DEF levels (0-10)
-Leave empty to deactivate:`, `${currentAtk}/${currentDef}`);
-        if (input === null) return; // cancelled
-        if (input.trim() === '') {
-            // Deactivate
-            shooter.bgs[bgIdx] = null;
-        } else {
-            const parts = input.split('/');
-            if (parts.length === 2) {
-                shooter.bgs[bgIdx] = {
-                    atkLvl: Math.min(10, Math.max(0, parseInt(parts[0]) || 0)),
-                    defLvl: Math.min(10, Math.max(0, parseInt(parts[1]) || 0))
-                };
-            }
-        }
+    if (type === 'atk') {
+        bg.atkLvl = Math.min(10, Math.max(0, (bg.atkLvl || 0) + delta));
     } else {
-        // Not active - activate with defaults
-        const activeCount = shooter.bgs.filter(b => b !== null && b !== undefined).length;
-        if (activeCount >= 5) {
-            alert('Max 5 BG! Önce birini kapat.');
-            return;
-        }
-        shooter.bgs[bgIdx] = { atkLvl: info.atkLvl, defLvl: info.defLvl };
+        bg.defLvl = Math.min(10, Math.max(0, (bg.defLvl || 0) + delta));
     }
     saveState();
     renderBaskinList();
