@@ -103,9 +103,16 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
     <a href="#" class="logout-btn" onclick="sessionStorage.removeItem('omerta_user');window.location.href='index.html';return false;"><span>🚪</span><span>Logout</span></a>
 </nav>
 
+<div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
+    🚀 Build: 28.01.2026 21:42:43 OT
+</div>
+<script>
+try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
+</script>
+
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 21:39 OT</div>
+    <div class="update-time">🕐 28.01.2026 21:42 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
