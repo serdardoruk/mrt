@@ -82,8 +82,10 @@
         .success.show { display: block; }
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 4px;
         }
         .tab {
             flex: 1;
@@ -92,14 +94,14 @@
             cursor: pointer;
             color: #64748b;
             font-weight: 600;
+            font-size: 14px;
             transition: all 0.2s;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
+            border-radius: 8px;
         }
-        .tab:hover { color: #2563eb; }
+        .tab:hover { color: #2563eb; background: rgba(37,99,235,0.1); }
         .tab.active {
-            color: #2563eb;
-            border-bottom-color: #2563eb;
+            color: #fff;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
         }
         .form-container { display: none; }
         .form-container.active { display: block; }
@@ -125,49 +127,49 @@
         <h1>Omerta War Planner</h1>
         
         <div class="tabs">
-            <div class="tab active" onclick="showTab('login')">Giriş Yap</div>
-            <div class="tab" onclick="showTab('signup')">Kayıt Ol</div>
+            <div class="tab active" onclick="showTab('login')">Login</div>
+            <div class="tab" onclick="showTab('signup')">Register</div>
         </div>
         
         <!-- Login Form -->
         <div id="login-container" class="form-container active">
             <form id="login-form" onsubmit="return handleLogin(event)">
                 <div class="form-group">
-                    <label for="username">Kullanıcı Adı</label>
+                    <label for="username">Username</label>
                     <input type="text" id="username" name="username" autocomplete="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Şifre</label>
+                    <label for="password">Password</label>
                     <input type="password" id="password" name="password" autocomplete="current-password" required>
                 </div>
-                <button type="submit">Giriş Yap ⚔️</button>
+                <button type="submit">Login ⚔️</button>
             </form>
-            <p id="error-msg" class="error">Kullanıcı adı veya şifre hatalı!</p>
+            <p id="error-msg" class="error">Invalid username or password!</p>
         </div>
         
         <!-- Signup Form -->
         <div id="signup-container" class="form-container">
             <form id="signup-form" onsubmit="return handleSignup(event)">
                 <div class="form-group">
-                    <label for="new-username">Kullanıcı Adı</label>
-                    <input type="text" id="new-username" name="new-username" autocomplete="username" required minlength="3" pattern="[a-zA-Z0-9_]+" title="Sadece harf, rakam ve alt çizgi">
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="new-username" autocomplete="username" required minlength="3" pattern="[a-zA-Z0-9_]+" title="Only letters, numbers and underscore">
                 </div>
                 <div class="form-group">
-                    <label for="new-password">Şifre</label>
+                    <label for="new-password">Password</label>
                     <input type="password" id="new-password" name="new-password" autocomplete="new-password" required minlength="4">
                 </div>
                 <div class="form-group">
-                    <label for="confirm-password">Şifre Tekrar</label>
+                    <label for="confirm-password">Confirm Password</label>
                     <input type="password" id="confirm-password" name="confirm-password" autocomplete="new-password" required minlength="4">
                 </div>
-                <button type="submit">Kayıt Ol 📝</button>
+                <button type="submit">Register 📝</button>
             </form>
             <p id="signup-error" class="error"></p>
             <p id="signup-success" class="success"></p>
         </div>
         
         <div class="footer">
-            Erişim sorunu için yönetici ile iletişime geçin
+            Contact admin for access issues
         </div>
     </div>
 
@@ -314,19 +316,19 @@
             
             // Validasyonlar
             if (username.length < 3) {
-                errorMsg.textContent = 'Kullanıcı adı en az 3 karakter olmalı!';
+                errorMsg.textContent = 'Username must be at least 3 characters!';
                 errorMsg.classList.add('show');
                 return false;
             }
             
             if (password.length < 4) {
-                errorMsg.textContent = 'Şifre en az 4 karakter olmalı!';
+                errorMsg.textContent = 'Password must be at least 4 characters!';
                 errorMsg.classList.add('show');
                 return false;
             }
             
             if (password !== confirmPassword) {
-                errorMsg.textContent = 'Şifreler eşleşmiyor!';
+                errorMsg.textContent = 'Passwords do not match!';
                 errorMsg.classList.add('show');
                 return false;
             }
@@ -338,7 +340,7 @@
             
             // Kullanıcı adı kontrolü
             if (USERS[username]) {
-                errorMsg.textContent = 'Bu kullanıcı adı zaten alınmış!';
+                errorMsg.textContent = 'Username already taken!';
                 errorMsg.classList.add('show');
                 return false;
             }
@@ -354,7 +356,7 @@
                     body: JSON.stringify(USERS)
                 });
                 
-                successMsg.textContent = '✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.';
+                successMsg.textContent = '✅ Registration successful! You can now login.';
                 successMsg.classList.add('show');
                 
                 // Formu temizle
@@ -367,7 +369,7 @@
                 
             } catch (e) {
                 console.error('[handleSignup] Firebase error:', e);
-                errorMsg.textContent = 'Kayıt sırasında hata oluştu!';
+                errorMsg.textContent = 'Registration error occurred!';
                 errorMsg.classList.add('show');
             }
             
