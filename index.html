@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Omerta War Planner - Giriş</title>
+    <title>Omerta War Planner - Login</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -436,10 +436,10 @@
         // Sayfa yüklendiğinde kullanıcıları Firebase'den çek
         loadUsers();
         
-        // Admin için: Yeni şifre hash'lemek için console'da getHash('şifre') çalıştır  
+        // Admin: Run getHash('password') in console to generate hash  
         window.getHash = async function(password) {
             const hash = await hashPassword(password);
-            console.log('Şifre:', password);
+            console.log('Password:', password);
             console.log('Hash:', hash);
             return hash;
         };
