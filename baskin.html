@@ -136,7 +136,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Add shooter hit buttons that update target stats (-1bg, -2bg, suit, car, blood)
+    🚀 BG hit dropdown (-1 to -5)
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -144,7 +144,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 02:34 OT</div>
+    <div class="update-time">🕐 29.01.2026 03:06 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -280,7 +280,7 @@ function renderBaskinList() {
             });
             const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
             const hits = s.hits || {};
-            const bgHit = hits.bg || 0;
+            const bgHit = parseInt(hits.bg) || 0;
             return `<div class="shooter-row" draggable="true" data-enemy="${idx}" data-shooter="${sIdx}" ondragstart="shooterDragStart(event)" ondragover="shooterDragOver(event)" ondrop="shooterDrop(event)" ondragend="shooterDragEnd(event)">
                 <span class="drag-handle">⋮⋮</span>
                 ${sPos}
@@ -291,12 +291,12 @@ function renderBaskinList() {
                 </div>
                 <div class="shooter-hits">
                     <select class="hit-select bg" onchange="setBgHit(${idx},${sIdx},this.value)">
-                        <option value="0" ${bgHit===0 ? 'selected' : ''}>BG</option>
-                        <option value="1" ${bgHit===1 ? 'selected' : ''}>-1</option>
-                        <option value="2" ${bgHit===2 ? 'selected' : ''}>-2</option>
-                        <option value="3" ${bgHit===3 ? 'selected' : ''}>-3</option>
-                        <option value="4" ${bgHit===4 ? 'selected' : ''}>-4</option>
-                        <option value="5" ${bgHit===5 ? 'selected' : ''}>-5</option>
+                        <option value="0" ${bgHit==0 ? 'selected' : ''}>BG</option>
+                        <option value="1" ${bgHit==1 ? 'selected' : ''}>-1</option>
+                        <option value="2" ${bgHit==2 ? 'selected' : ''}>-2</option>
+                        <option value="3" ${bgHit==3 ? 'selected' : ''}>-3</option>
+                        <option value="4" ${bgHit==4 ? 'selected' : ''}>-4</option>
+                        <option value="5" ${bgHit==5 ? 'selected' : ''}>-5</option>
                     </select>
                     <span class="hit-btn suit ${hits.suit ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'suit')" title="Suit düştü">🛡</span>
                     <span class="hit-btn car ${hits.car ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'car')" title="Araba patladı">🚗</span>
