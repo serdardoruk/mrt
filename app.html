@@ -141,14 +141,22 @@
                 height: 50px; 
             }
             .app-footer {
-                height: 50px;
+                height: auto;
+                min-height: 40px;
+                padding: 8px 10px;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            .footer-item {
+                font-size: 11px;
+                padding: 2px 6px;
             }
             .app-content {
                 margin-top: 50px;
-                margin-bottom: 50px;
+                margin-bottom: 60px;
             }
             .app-content iframe {
-                height: calc(100vh - 100px);
+                height: calc(100vh - 110px);
             }
             .header-left { display: none; }
         }
