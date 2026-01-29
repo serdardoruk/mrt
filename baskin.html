@@ -60,13 +60,13 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .shooter-pos { font-weight: 700; font-size: 10px; color: #0f172a; }
 .shooter-name { font-weight: 600; color: #16a34a; font-size: 11px; }
 .shooter-meta { color: #64748b; font-size: 9px; }
-.shooter-bg { display: flex; gap: 1px; align-items: center; margin-left: auto; opacity: 0.6; }
+.shooter-bg { display: flex; gap: 2px; align-items: center; margin-left: auto; opacity: 0.7; flex-wrap: wrap; }
 .shooter-bg:hover { opacity: 1; }
-.shooter-bg-item { padding: 1px 3px; border-radius: 2px; font-size: 7px; font-weight: 500; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; border: 1px solid; }
-.shooter-bg-item.inactive { background: #f8fafc; border: 1px dashed #e2e8f0; color: #cbd5e1; opacity: 0.5; font-size: 6px; }
-.shooter-bg-item.active .bg-name { font-size: 6px; color: #555; }
-.shooter-bg-item.active .bg-vals { font-size: 7px; font-weight: 600; color: #444; }
-.shooter-bg-item:hover { opacity: 0.9; }
+.shooter-bg-item { padding: 1px 4px; border-radius: 3px; font-size: 8px; font-weight: 600; cursor: pointer; user-select: none; border: 1px solid; white-space: nowrap; }
+.shooter-bg-item.inactive { background: #f8fafc; border: 1px dashed #e2e8f0; color: #94a3b8; font-size: 7px; }
+.shooter-bg-item:hover { opacity: 0.8; }
+.shooter-result { width: 60px; padding: 2px 4px; border-radius: 3px; border: 1px solid #cbd5e1; font-size: 9px; background: #f8fafc; }
+.shooter-result:focus { outline: none; border-color: #2563eb; background: #fff; }
 .target-bg-count { cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #fef3c7; border: 1px solid #fbbf24; user-select: none; }
 .target-bg-count:hover { background: #fde68a; }
 .target-bg-count.has-dead { background: #fee2e2; border-color: #f87171; color: #dc2626; }
@@ -114,7 +114,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Timers: SH 1h, Blood 60m, Fly 30m
+    🚀 Timers under stat buttons
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -122,7 +122,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 00:51 OT</div>
+    <div class="update-time">🕐 29.01.2026 00:52 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -248,15 +248,13 @@ function renderBaskinList() {
                     const b = Math.round(38 * atkRatio + 235 * (1 - atkRatio));
                     const bgColor = `rgba(${r},${g},${b},0.2)`;
                     const borderColor = `rgba(${r},${g},${b},0.6)`;
-                    activeBgs.push(`<div class="shooter-bg-item active" style="background:${bgColor};border-color:${borderColor}" onclick="bgClick(event,${idx},${sIdx},${i})" oncontextmenu="disableBg(${idx},${sIdx},${i}); return false;" title="Click:cycle Shift/R:off">
-                        <span class="bg-name">${info.name}</span>
-                        <span class="bg-vals">${bg.atk}/${bg.def}</span>
-                    </div>`);
+                    activeBgs.push(`<span class="shooter-bg-item active" style="background:${bgColor};border-color:${borderColor}" onclick="bgClick(event,${idx},${sIdx},${i})" oncontextmenu="disableBg(${idx},${sIdx},${i}); return false;" title="Click:cycle Shift/R:off">${info.name}${bg.atk}/${bg.def}</span>`);
                 } else {
-                    inactiveBgs.push(`<div class="shooter-bg-item inactive" onclick="enableBg(${idx},${sIdx},${i})" title="${info.name} - Click to enable">${info.name}</div>`);
+                    inactiveBgs.push(`<span class="shooter-bg-item inactive" onclick="enableBg(${idx},${sIdx},${i})" title="${info.name} - Click to enable">${info.name}</span>`);
                 }
             });
             const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
+            const resultVal = s.result || '';
             return `<div class="shooter-row" draggable="true" data-enemy="${idx}" data-shooter="${sIdx}" ondragstart="shooterDragStart(event)" ondragover="shooterDragOver(event)" ondrop="shooterDrop(event)" ondragend="shooterDragEnd(event)">
                 <span class="drag-handle">⋮⋮</span>
                 ${sPos}
@@ -265,6 +263,7 @@ function renderBaskinList() {
                 <div class="shooter-bg">
                     ${bgsHtml}
                 </div>
+                <input class="shooter-result" type="text" placeholder="result..." value="${resultVal}" onchange="updateShooterResult(${idx},${sIdx},this.value)">
                 <span class="shooter-remove" onclick="removeShooter(${idx}, ${sIdx})">×</span>
             </div>`;
         }).join('') : '';
@@ -461,6 +460,11 @@ setInterval(() => {
 
 function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     baskinList[enemyIdx].shooters[shooterIdx][bgType] = parseFloat(value) || 0;
+    saveState();
+}
+
+function updateShooterResult(enemyIdx, shooterIdx, value) {
+    baskinList[enemyIdx].shooters[shooterIdx].result = value;
     saveState();
 }
 
