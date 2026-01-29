@@ -183,7 +183,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>(function(){function updateOmertaTimer(){const el=document.getElementById('omertaTimer');if(!el)return;const now=new Date();const utc=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds());const hours=[0,4,8,12,16,20];const todayMidnight=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate());let nextOmerta=null;for(let h of hours){const t=todayMidnight+h*3600000;if(t>utc){nextOmerta=t;break;}}if(!nextOmerta)nextOmerta=todayMidnight+24*3600000;const diff=nextOmerta-utc;const m=Math.floor(diff/60000);const s=Math.floor((diff%60000)/1000);el.textContent='⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}updateOmertaTimer();setInterval(updateOmertaTimer,1000);})();</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 29.01.2026 17:21 OT</div>
+<div class='update-time'>🕐 29.01.2026 17:24 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
