@@ -136,7 +136,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG hit dropdown (-1 to -5)
+    🚀 Fix BG dropdown comparison
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -144,7 +144,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 03:06 OT</div>
+    <div class="update-time">🕐 29.01.2026 03:09 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -592,9 +592,11 @@ function toggleHit(enemyIdx, shooterIdx, hitType) {
 }
 
 function setBgHit(enemyIdx, shooterIdx, value) {
+    console.log('setBgHit called:', enemyIdx, shooterIdx, value);
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.hits) shooter.hits = {};
     shooter.hits.bg = parseInt(value) || 0;
+    console.log('shooter.hits.bg set to:', shooter.hits.bg);
     recalculateFromHits(enemyIdx);
     saveState();
     renderBaskinList();
@@ -611,16 +613,18 @@ function recalculateFromHits(enemyIdx) {
     
     (item.shooters || []).forEach(s => {
         const hits = s.hits || {};
-        totalBgDead += (hits.bg || 0);
+        totalBgDead += (parseInt(hits.bg) || 0);
         if (hits.suit) suitHit = true;
         if (hits.car) carHit = true;
         if (hits.blood) bloodHit = true;
     });
     
+    console.log('recalculateFromHits: totalBgDead=', totalBgDead);
     item.stats.bgDead = Math.min(totalBgDead, 5);
-    item.stats.suit = suitHit ? false : undefined;
-    item.stats.car = carHit ? true : undefined;
-    item.stats.blood = bloodHit ? false : undefined;
+    console.log('item.stats.bgDead set to:', item.stats.bgDead);
+    if (suitHit) item.stats.suit = false;
+    if (carHit) item.stats.car = true;
+    if (bloodHit) item.stats.blood = false;
 }
 
 const bgDefaults = [
