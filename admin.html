@@ -191,12 +191,22 @@
     </style>
 </head>
 <body>
-    <nav class="top-nav">
-        <a href="matchings_latest.html"><span>⚔️</span><span class="nav-label">Savaş</span></a>
-        <a href="family_roster_latest.html"><span>👥</span><span class="nav-label">Aileler</span></a>
-        <a href="admin.html" class="active"><span>⚙️</span><span class="nav-label">Admin</span></a>
-        <a href="#" onclick="sessionStorage.removeItem('omerta_user');window.location.href='index.html';return false;"><span>🚪</span><span class="nav-label">Çıkış</span></a>
-    </nav>
+    <!-- 
+    Omerta Navigation Template
+    Bu dosya Python tarafından okunup her HTML sayfasına eklenir.
+    Yeni sayfa eklemek için burayı güncelle, Python otomatik tüm sayfalara uygular.
+-->
+
+<nav class='top-nav'>
+    <span class='omerta-timer' id='omertaTimer'></span>
+    <a href='matchings_latest.html' data-page='matchings'><span>⚔️</span><span class='nav-label'>Savaş</span></a>
+    <a href='baskin.html' data-page='baskin'><span>🎯</span><span class='nav-label'>Baskın</span></a>
+    <a href='family_roster_latest.html' data-page='roster'><span>👥</span><span class='nav-label'>Aileler</span></a>
+    <a href='admin.html' id='admin-link' data-page='admin' class='active' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a>
+    <a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a>
+</nav>
+
+
     
     <div class="container">
         <h1>⚙️ Admin Panel</h1>
