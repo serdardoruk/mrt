@@ -88,6 +88,13 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .drag-handle:active { cursor: grabbing; }
 .shooter-row.dragging { opacity: 0.4; background: #dbeafe; }
 .shooter-row.drag-over { border-top: 2px solid #2563eb; }
+.shooter-hits { display: flex; gap: 2px; align-items: center; margin-left: 4px; }
+.hit-btn { padding: 1px 4px; border-radius: 3px; font-size: 8px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; }
+.hit-btn:hover { background: #e2e8f0; }
+.hit-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+.hit-btn.active.suit { background: #2563eb; border-color: #2563eb; }
+.hit-btn.active.car { background: #f59e0b; border-color: #f59e0b; }
+.hit-btn.active.blood { background: #be123c; border-color: #be123c; }
 .shooter-remove { cursor: pointer; color: #ef4444; font-size: 11px; opacity: 0.7; }
 .shooter-remove:hover { opacity: 1; }
 .add-shooter-btn { padding: 3px 8px; border-radius: 4px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 10px; }
@@ -125,7 +132,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Add Omerta countdown timer to all pages nav bar
+    🚀 Simplify result tracking: remove shooter results, add BG/Suit/Car/Blood buttons on target
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -133,7 +140,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 02:13 OT</div>
+    <div class="update-time">🕐 29.01.2026 02:31 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -268,6 +275,7 @@ function renderBaskinList() {
                 }
             });
             const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
+            const hits = s.hits || {};
             return `<div class="shooter-row" draggable="true" data-enemy="${idx}" data-shooter="${sIdx}" ondragstart="shooterDragStart(event)" ondragover="shooterDragOver(event)" ondrop="shooterDrop(event)" ondragend="shooterDragEnd(event)">
                 <span class="drag-handle">⋮⋮</span>
                 ${sPos}
@@ -275,6 +283,13 @@ function renderBaskinList() {
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
                 <div class="shooter-bg">
                     ${bgsHtml}
+                </div>
+                <div class="shooter-hits">
+                    <span class="hit-btn ${hits.bg1 ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'bg1')" title="-1 BG">-1</span>
+                    <span class="hit-btn ${hits.bg2 ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'bg2')" title="-2 BG">-2</span>
+                    <span class="hit-btn suit ${hits.suit ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'suit')" title="Suit düştü">🛡</span>
+                    <span class="hit-btn car ${hits.car ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'car')" title="Araba patladı">🚗</span>
+                    <span class="hit-btn blood ${hits.blood ? 'active' : ''}" onclick="toggleHit(${idx},${sIdx},'blood')" title="Blood düştü">🩸</span>
                 </div>
                 <span class="shooter-remove" onclick="removeShooter(${idx}, ${sIdx})">×</span>
             </div>`;
@@ -554,6 +569,39 @@ setInterval(() => {
 function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     baskinList[enemyIdx].shooters[shooterIdx][bgType] = parseFloat(value) || 0;
     saveState();
+}
+
+function toggleHit(enemyIdx, shooterIdx, hitType) {
+    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
+    if (!shooter.hits) shooter.hits = {};
+    shooter.hits[hitType] = !shooter.hits[hitType];
+    recalculateFromHits(enemyIdx);
+    saveState();
+    renderBaskinList();
+}
+
+function recalculateFromHits(enemyIdx) {
+    const item = baskinList[enemyIdx];
+    if (!item.stats) item.stats = {};
+    
+    let totalBgDead = 0;
+    let suitHit = false;
+    let carHit = false;
+    let bloodHit = false;
+    
+    (item.shooters || []).forEach(s => {
+        const hits = s.hits || {};
+        if (hits.bg1) totalBgDead += 1;
+        if (hits.bg2) totalBgDead += 2;
+        if (hits.suit) suitHit = true;
+        if (hits.car) carHit = true;
+        if (hits.blood) bloodHit = true;
+    });
+    
+    item.stats.bgDead = Math.min(totalBgDead, 5);
+    item.stats.suit = suitHit ? false : undefined;
+    item.stats.car = carHit ? true : undefined;
+    item.stats.blood = bloodHit ? false : undefined;
 }
 
 const bgDefaults = [
