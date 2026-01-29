@@ -49,6 +49,12 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .can-fly { padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; }
 .can-fly.yes { background: #22c55e; color: #fff; }
 .can-fly.no { background: #ef4444; color: #fff; }
+.timers-row { display: flex; gap: 8px; padding: 4px 12px; background: #fef3c7; border-radius: 4px; margin-top: 4px; flex-wrap: wrap; }
+.timer-item { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: monospace; cursor: pointer; }
+.timer-item.fly { background: #dbeafe; color: #1d4ed8; }
+.timer-item.sh { background: #fce7f3; color: #be185d; }
+.timer-item.blood { background: #fee2e2; color: #dc2626; }
+.timer-item:hover { opacity: 0.7; }
 .shooter-section { display: flex; flex-direction: column; gap: 2px; padding-left: 12px; border-left: 2px solid #22c55e; margin-left: 4px; }
 .shooter-row { display: flex; align-items: center; gap: 4px; padding: 2px 4px; background: rgba(34,197,94,0.1); border-radius: 3px; }
 .shooter-pos { font-weight: 700; font-size: 10px; color: #0f172a; }
@@ -108,7 +114,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Suit Blood SH text
+    🚀 More visible inactive stat buttons
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -116,7 +122,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 00:21 OT</div>
+    <div class="update-time">🕐 29.01.2026 00:45 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -296,9 +302,49 @@ function renderBaskinList() {
                     ${getFlyStatus(idx, st)}
                 </div>
                 ${shootersHtml ? `<div class="shooter-section">${shootersHtml}</div>` : ''}
+                ${getTimersHtml(idx, st)}
             </div>
         `;
     }).join('');
+}
+
+function getTimersHtml(idx, st) {
+    const timers = [];
+    const now = Date.now();
+    
+    // Fly timer
+    if (st.flyUntil && st.flyUntil > now) {
+        const remaining = st.flyUntil - now;
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        timers.push(`<span class="timer-item fly" onclick="cancelTimer(${idx},'flyUntil')">✈️ Fly: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+    }
+    
+    // SH timer
+    if (st.shUntil && st.shUntil > now) {
+        const remaining = st.shUntil - now;
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        timers.push(`<span class="timer-item sh" onclick="cancelTimer(${idx},'shUntil')">🏠 SH: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+    }
+    
+    // Blood timer
+    if (st.bloodUntil && st.bloodUntil > now) {
+        const remaining = st.bloodUntil - now;
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        timers.push(`<span class="timer-item blood" onclick="cancelTimer(${idx},'bloodUntil')">🩸 Blood: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+    }
+    
+    if (!timers.length) return '';
+    return `<div class="timers-row">${timers.join('')}</div>`;
+}
+
+function cancelTimer(enemyIdx, timerKey) {
+    if (!baskinList[enemyIdx].stats) return;
+    delete baskinList[enemyIdx].stats[timerKey];
+    saveState();
+    renderBaskinList();
 }
 
 let draggedShooter = null;
@@ -352,8 +398,25 @@ function updateStat(enemyIdx, statKey, value) {
 
 function toggleStat(enemyIdx, statKey) {
     if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
-    const current = baskinList[enemyIdx].stats[statKey];
-    baskinList[enemyIdx].stats[statKey] = current === false ? true : false;
+    const st = baskinList[enemyIdx].stats;
+    const current = st[statKey];
+    const wasActive = current !== false;
+    st[statKey] = wasActive ? false : true;
+    
+    // Timer logic: when toggled OFF (was active, now inactive)
+    if (wasActive) {
+        if (statKey === 'sh') {
+            // SH off = 1 hour cooldown
+            st.shUntil = Date.now() + (60 * 60 * 1000);
+        } else if (statKey === 'blood') {
+            // Blood off = 60 min cooldown (adjustable)
+            st.bloodUntil = Date.now() + (60 * 60 * 1000);
+        }
+    } else {
+        // Toggled back ON - clear timer
+        if (statKey === 'sh') delete st.shUntil;
+        if (statKey === 'blood') delete st.bloodUntil;
+    }
     saveState();
     renderBaskinList();
 }
@@ -388,7 +451,11 @@ function cancelFlyTimer(enemyIdx) {
 
 // Timer'ları güncelle
 setInterval(() => {
-    const hasActiveTimers = baskinList.some(item => item.stats?.flyUntil > Date.now());
+    const hasActiveTimers = baskinList.some(item => {
+        const st = item.stats || {};
+        const now = Date.now();
+        return (st.flyUntil > now) || (st.shUntil > now) || (st.bloodUntil > now);
+    });
     if (hasActiveTimers) renderBaskinList();
 }, 1000);
 
