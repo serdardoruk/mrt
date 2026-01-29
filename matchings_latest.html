@@ -1,6 +1,6 @@
 <html><head><meta charset='utf-8'><title>Savaş Planlayıcı</title>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
-<script>if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}</script>
+<script>try{if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}}catch(e){window.location.href='index.html';}</script>
 <style>
 body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #f6f8fc, #eef2f7); color: #0f172a; font-size: 14px; }
 .page { max-width: 1280px; margin: 0 auto 24px; padding: 0 18px; display: flex; flex-direction: column; gap: 14px; }
@@ -168,7 +168,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>(function(){function updateOmertaTimer(){const el=document.getElementById('omertaTimer');if(!el)return;const now=new Date();const utc=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds());const hours=[0,4,8,12,16,20];const todayMidnight=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate());let nextOmerta=null;for(let h of hours){const t=todayMidnight+h*3600000;if(t>utc){nextOmerta=t;break;}}if(!nextOmerta)nextOmerta=todayMidnight+24*3600000;const diff=nextOmerta-utc;const m=Math.floor(diff/60000);const s=Math.floor((diff%60000)/1000);el.textContent='⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}updateOmertaTimer();setInterval(updateOmertaTimer,1000);})();</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 29.01.2026 03:11 OT</div>
+<div class='update-time'>🕐 29.01.2026 03:19 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>

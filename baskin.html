@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Raid Planner</title>
-<script>if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}</script>
+<script>try{if(!sessionStorage.getItem('omerta_user')){window.location.href='index.html';}}catch(e){window.location.href='index.html';}</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f6f8fc, #eef2f7); min-height: 100vh; color: #0f172a; padding: 20px; margin-top: 60px; }
@@ -136,7 +136,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Debug BG hit
+    🚀 Larger hit buttons and dropdown
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -144,7 +144,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 03:11 OT</div>
+    <div class="update-time">🕐 29.01.2026 03:19 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
