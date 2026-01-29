@@ -88,12 +88,12 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .drag-handle:active { cursor: grabbing; }
 .shooter-row.dragging { opacity: 0.4; background: #dbeafe; }
 .shooter-row.drag-over { border-top: 2px solid #2563eb; }
-.shooter-hits { display: flex; gap: 2px; align-items: center; margin-left: 4px; }
-.hit-select { padding: 1px 2px; border-radius: 3px; font-size: 9px; font-weight: 600; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer; }
+.shooter-hits { display: flex; gap: 4px; align-items: center; margin-left: 6px; }
+.hit-select { padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer; }
 .hit-select:focus { outline: none; border-color: #2563eb; }
-.hit-select.bg { width: 38px; }
+.hit-select.bg { width: 50px; }
 .hit-select:not([value="0"]) { background: #fee2e2; border-color: #f87171; color: #dc2626; }
-.hit-btn { padding: 1px 4px; border-radius: 3px; font-size: 8px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; }
+.hit-btn { padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; }
 .hit-btn:hover { background: #e2e8f0; }
 .hit-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 .hit-btn.active.suit { background: #2563eb; border-color: #2563eb; }
@@ -136,7 +136,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Fix BG dropdown comparison
+    🚀 Debug BG hit
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -144,7 +144,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 03:09 OT</div>
+    <div class="update-time">🕐 29.01.2026 03:11 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -592,11 +592,9 @@ function toggleHit(enemyIdx, shooterIdx, hitType) {
 }
 
 function setBgHit(enemyIdx, shooterIdx, value) {
-    console.log('setBgHit called:', enemyIdx, shooterIdx, value);
     const shooter = baskinList[enemyIdx].shooters[shooterIdx];
     if (!shooter.hits) shooter.hits = {};
     shooter.hits.bg = parseInt(value) || 0;
-    console.log('shooter.hits.bg set to:', shooter.hits.bg);
     recalculateFromHits(enemyIdx);
     saveState();
     renderBaskinList();
@@ -619,9 +617,7 @@ function recalculateFromHits(enemyIdx) {
         if (hits.blood) bloodHit = true;
     });
     
-    console.log('recalculateFromHits: totalBgDead=', totalBgDead);
     item.stats.bgDead = Math.min(totalBgDead, 5);
-    console.log('item.stats.bgDead set to:', item.stats.bgDead);
     if (suitHit) item.stats.suit = false;
     if (carHit) item.stats.car = true;
     if (bloodHit) item.stats.blood = false;
