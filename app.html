@@ -21,14 +21,14 @@
             left: 0; 
             right: 0; 
             height: 50px; 
-            background: #0f172a; 
+            background: linear-gradient(135deg, #1e293b, #334155); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 12px; 
             z-index: 9999; 
             padding: 0 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
         }
         .top-nav a { 
             height: 36px; 
@@ -38,23 +38,35 @@
             gap: 6px; 
             padding: 0 14px; 
             border-radius: 8px; 
-            background: #1e293b; 
-            color: #94a3b8; 
+            background: rgba(255,255,255,0.1); 
+            color: #cbd5e1; 
             text-decoration: none; 
             font-size: 14px; 
             transition: all 0.2s; 
         }
-        .top-nav a:hover { background: #334155; color: #fff; }
+        .top-nav a:hover { background: rgba(255,255,255,0.2); color: #fff; }
         .top-nav a.active { background: #2563eb; color: #fff; }
         .top-nav a span:first-child { font-size: 16px; }
         .nav-label { font-size: 13px; font-weight: 600; }
+        .header-left {
+            position: absolute;
+            left: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
         .omerta-timer { 
-            position: absolute; 
-            left: 12px; 
             color: #fbbf24; 
             font-family: monospace; 
             font-size: 14px; 
             font-weight: 700; 
+        }
+        .update-time {
+            color: #94a3b8;
+            font-size: 11px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
         }
         .logout-btn { 
             position: absolute !important; 
@@ -106,7 +118,7 @@
             .app-content iframe {
                 height: calc(100vh - 60px);
             }
-            .omerta-timer { display: none; }
+            .header-left { display: none; }
             .logout-btn { position: relative !important; right: auto !important; }
         }
     </style>
@@ -125,7 +137,10 @@
 
     <!-- Sabit Header -->
     <nav class="top-nav">
-        <span class="omerta-timer" id="omertaTimer"></span>
+        <div class="header-left">
+            <span class="omerta-timer" id="omertaTimer"></span>
+            <span class="update-time" id="updateTime">🕐 --</span>
+        </div>
         <a href="#matchings" data-page="matchings"><span>⚔️</span><span class="nav-label">Savaş</span></a>
         <a href="#baskin" data-page="baskin"><span>🎯</span><span class="nav-label">Baskın</span></a>
         <a href="#roster" data-page="roster"><span>👥</span><span class="nav-label">Aileler</span></a>
@@ -211,6 +226,19 @@
             } catch(e) {}
         }
         
+        // Update time yükle
+        async function loadUpdateTime() {
+            try {
+                const res = await fetch('data/update_time.txt');
+                if (res.ok) {
+                    const time = await res.text();
+                    document.getElementById('updateTime').textContent = '🕐 ' + time.trim();
+                }
+            } catch(e) {
+                // Sessizce başarısız ol
+            }
+        }
+        
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
@@ -223,6 +251,7 @@
         setupAdmin();
         updateTimer();
         setInterval(updateTimer, 1000);
+        loadUpdateTime();
         handleHash();
     </script>
 </body>
