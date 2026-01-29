@@ -50,11 +50,14 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .can-fly.yes { background: #22c55e; color: #fff; }
 .can-fly.no { background: #ef4444; color: #fff; }
 .timers-row { display: flex; gap: 8px; padding: 4px 12px; background: #fef3c7; border-radius: 4px; margin-top: 4px; flex-wrap: wrap; }
-.timer-item { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: monospace; cursor: pointer; }
+.timer-item { display: flex; align-items: center; gap: 2px; padding: 2px 4px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: monospace; }
 .timer-item.fly { background: #dbeafe; color: #1d4ed8; }
 .timer-item.sh { background: #fce7f3; color: #be185d; }
 .timer-item.blood { background: #fee2e2; color: #dc2626; }
-.timer-item:hover { opacity: 0.7; }
+.timer-text { cursor: pointer; padding: 0 2px; }
+.timer-text:hover { text-decoration: underline; }
+.timer-adj { cursor: pointer; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; font-weight: 700; }
+.timer-adj:hover { background: rgba(0,0,0,0.1); }
 .shooter-section { display: flex; flex-direction: column; gap: 2px; padding-left: 12px; border-left: 2px solid #22c55e; margin-left: 4px; }
 .shooter-row { display: flex; align-items: center; gap: 4px; padding: 2px 4px; background: rgba(34,197,94,0.1); border-radius: 3px; }
 .shooter-pos { font-weight: 700; font-size: 10px; color: #0f172a; }
@@ -114,7 +117,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Timers under stat buttons
+    🚀 Horizontal BG + result input box
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -122,7 +125,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 00:52 OT</div>
+    <div class="update-time">🕐 29.01.2026 00:56 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -316,7 +319,11 @@ function getTimersHtml(idx, st) {
         const remaining = st.flyUntil - now;
         const mins = Math.floor(remaining / 60000);
         const secs = Math.floor((remaining % 60000) / 1000);
-        timers.push(`<span class="timer-item fly" onclick="cancelTimer(${idx},'flyUntil')">✈️ Fly: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+        timers.push(`<span class="timer-item fly">
+            <span class="timer-adj" onclick="adjustTimer(${idx},'flyUntil',-5)">−</span>
+            <span class="timer-text" onclick="editTimer(${idx},'flyUntil')">✈️${mins}:${String(secs).padStart(2,'0')}</span>
+            <span class="timer-adj" onclick="adjustTimer(${idx},'flyUntil',5)">+</span>
+        </span>`);
     }
     
     // SH timer
@@ -324,7 +331,11 @@ function getTimersHtml(idx, st) {
         const remaining = st.shUntil - now;
         const mins = Math.floor(remaining / 60000);
         const secs = Math.floor((remaining % 60000) / 1000);
-        timers.push(`<span class="timer-item sh" onclick="cancelTimer(${idx},'shUntil')">🏠 SH: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+        timers.push(`<span class="timer-item sh">
+            <span class="timer-adj" onclick="adjustTimer(${idx},'shUntil',-5)">−</span>
+            <span class="timer-text" onclick="editTimer(${idx},'shUntil')">🏠${mins}:${String(secs).padStart(2,'0')}</span>
+            <span class="timer-adj" onclick="adjustTimer(${idx},'shUntil',5)">+</span>
+        </span>`);
     }
     
     // Blood timer
@@ -332,11 +343,42 @@ function getTimersHtml(idx, st) {
         const remaining = st.bloodUntil - now;
         const mins = Math.floor(remaining / 60000);
         const secs = Math.floor((remaining % 60000) / 1000);
-        timers.push(`<span class="timer-item blood" onclick="cancelTimer(${idx},'bloodUntil')">🩸 Blood: ${mins}:${String(secs).padStart(2,'0')}</span>`);
+        timers.push(`<span class="timer-item blood">
+            <span class="timer-adj" onclick="adjustTimer(${idx},'bloodUntil',-5)">−</span>
+            <span class="timer-text" onclick="editTimer(${idx},'bloodUntil')">🩸${mins}:${String(secs).padStart(2,'0')}</span>
+            <span class="timer-adj" onclick="adjustTimer(${idx},'bloodUntil',5)">+</span>
+        </span>`);
     }
     
     if (!timers.length) return '';
     return `<div class="timers-row">${timers.join('')}</div>`;
+}
+
+function adjustTimer(enemyIdx, timerKey, minutes) {
+    if (!baskinList[enemyIdx].stats) return;
+    const st = baskinList[enemyIdx].stats;
+    if (!st[timerKey]) return;
+    st[timerKey] += minutes * 60 * 1000;
+    if (st[timerKey] <= Date.now()) delete st[timerKey];
+    saveState();
+    renderBaskinList();
+}
+
+function editTimer(enemyIdx, timerKey) {
+    if (!baskinList[enemyIdx].stats) return;
+    const st = baskinList[enemyIdx].stats;
+    if (!st[timerKey]) return;
+    const remaining = Math.floor((st[timerKey] - Date.now()) / 60000);
+    const newMins = prompt('Timer (dakika):', remaining);
+    if (newMins === null) return;
+    const mins = parseInt(newMins);
+    if (isNaN(mins) || mins <= 0) {
+        delete st[timerKey];
+    } else {
+        st[timerKey] = Date.now() + mins * 60 * 1000;
+    }
+    saveState();
+    renderBaskinList();
 }
 
 function cancelTimer(enemyIdx, timerKey) {
