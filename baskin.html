@@ -43,6 +43,9 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .stat-btn.active { border-color: #22c55e; background: #dcfce7; color: #16a34a; }
 .stat-btn.inactive { opacity: 0.7; background: #f1f5f9; color: #94a3b8; border: 1px dashed #cbd5e1; }
 .stat-btn.inactive:hover { opacity: 1; background: #e2e8f0; }
+.stat-btn.suit.active { border-color: #3b82f6; background: #dbeafe; color: #1d4ed8; }
+.stat-btn.car.active { border-color: #f59e0b; background: #fef3c7; color: #b45309; }
+.stat-btn.blood.active { border-color: #ef4444; background: #fee2e2; color: #dc2626; }
 .city-select { padding: 2px 4px; border-radius: 3px; font-size: 10px; font-weight: 600; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; cursor: pointer; }
 .city-select:focus { outline: none; border-color: #2563eb; }
 .city-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f1f5f9; border-radius: 6px; margin-top: 4px; flex-wrap: wrap; }
@@ -85,11 +88,6 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 .drag-handle:active { cursor: grabbing; }
 .shooter-row.dragging { opacity: 0.4; background: #dbeafe; }
 .shooter-row.drag-over { border-top: 2px solid #2563eb; }
-.shooter-results { display: flex; gap: 2px; align-items: center; }
-.result-check { display: flex; align-items: center; gap: 1px; font-size: 9px; cursor: pointer; padding: 1px 3px; border-radius: 3px; background: #f1f5f9; }
-.result-check:hover { background: #e2e8f0; }
-.result-check input { width: 10px; height: 10px; margin: 0; }
-.result-check input:checked + span { font-weight: 700; }
 .shooter-remove { cursor: pointer; color: #ef4444; font-size: 11px; opacity: 0.7; }
 .shooter-remove:hover { opacity: 1; }
 .add-shooter-btn { padding: 3px 8px; border-radius: 4px; border: 1px dashed #94a3b8; background: transparent; color: #64748b; cursor: pointer; font-size: 10px; }
@@ -127,7 +125,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 Result dropdown: kill, -1bg, suit, car, miss, blood
+    🚀 Add Omerta countdown timer to all pages nav bar
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -135,7 +133,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 29.01.2026 02:08 OT</div>
+    <div class="update-time">🕐 29.01.2026 02:13 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -270,7 +268,6 @@ function renderBaskinList() {
                 }
             });
             const bgsHtml = activeBgs.join('') + inactiveBgs.join('');
-            const results = s.results || [];
             return `<div class="shooter-row" draggable="true" data-enemy="${idx}" data-shooter="${sIdx}" ondragstart="shooterDragStart(event)" ondragover="shooterDragOver(event)" ondrop="shooterDrop(event)" ondragend="shooterDragEnd(event)">
                 <span class="drag-handle">⋮⋮</span>
                 ${sPos}
@@ -278,14 +275,6 @@ function renderBaskinList() {
                 <span class="shooter-meta">${s.Family} ${sRank}</span>
                 <div class="shooter-bg">
                     ${bgsHtml}
-                </div>
-                <div class="shooter-results">
-                    <label class="result-check"><input type="checkbox" ${results.includes('kill') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'kill',this.checked)">💀</label>
-                    <label class="result-check"><input type="checkbox" ${results.includes('-1bg') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'-1bg',this.checked)">-1</label>
-                    <label class="result-check"><input type="checkbox" ${results.includes('-2bg') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'-2bg',this.checked)">-2</label>
-                    <label class="result-check"><input type="checkbox" ${results.includes('suit') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'suit',this.checked)">🛡️</label>
-                    <label class="result-check"><input type="checkbox" ${results.includes('car') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'car',this.checked)">🚗</label>
-                    <label class="result-check"><input type="checkbox" ${results.includes('blood') ? 'checked' : ''} onchange="toggleResult(${idx},${sIdx},'blood',this.checked)">🩸</label>
                 </div>
                 <span class="shooter-remove" onclick="removeShooter(${idx}, ${sIdx})">×</span>
             </div>`;
@@ -300,14 +289,18 @@ function renderBaskinList() {
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-block">
                             <div class="stat-col">
-                                <span class="target-bg-count ${(st.bgDead || 0) > 0 ? 'has-dead' : ''}" onclick="cycleTargetBg(${idx})" title="Click: +1 dead BG">${(st.bgDead || 0) > 0 ? '-' + st.bgDead + ' BG' : '5 BG'}</span>
+                                <span class="target-bg-count ${(st.bgDead || 0) > 0 ? 'has-dead' : ''}" onclick="cycleTargetBg(${idx})" oncontextmenu="cycleTargetBgBack(${idx}); return false;" title="Click: +1 / RightClick: -1">${(st.bgDead || 0) > 0 ? '-' + st.bgDead + ' BG' : '5 BG'}</span>
                             </div>
                             <div class="stat-col">
-                                <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">Suit</button>
+                                <button class="stat-btn suit ${st.suit === false ? 'inactive' : 'active'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">Suit</button>
                             </div>
                             <div class="stat-col">
-                                <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">Blood</button>
+                                <button class="stat-btn car ${st.car === true ? 'inactive' : 'active'}" onclick="toggleStat(${idx},'car')" title="Araba">Car</button>
+                            </div>
+                            <div class="stat-col">
+                                <button class="stat-btn blood ${st.blood === false ? 'inactive' : 'active'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">Blood</button>
                                 ${getTimerHtml(idx, st, 'bloodUntil', '🩸')}
+                            </div>
                             </div>
                             <div class="stat-col">
                                 <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">SH</button>
@@ -485,6 +478,15 @@ function updateStat(enemyIdx, statKey, value) {
 function toggleStat(enemyIdx, statKey) {
     if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
     const st = baskinList[enemyIdx].stats;
+    
+    // Car logic is inverted: true = exploded (inactive), undefined/false = normal (active)
+    if (statKey === 'car') {
+        st.car = st.car === true ? false : true;
+        saveState();
+        renderBaskinList();
+        return;
+    }
+    
     const current = st[statKey];
     const wasActive = current !== false;
     st[statKey] = wasActive ? false : true;
@@ -554,52 +556,6 @@ function updateShooterBg(enemyIdx, shooterIdx, bgType, value) {
     saveState();
 }
 
-function toggleResult(enemyIdx, shooterIdx, resultType, checked) {
-    const shooter = baskinList[enemyIdx].shooters[shooterIdx];
-    if (!shooter.results) shooter.results = [];
-    
-    if (checked) {
-        if (!shooter.results.includes(resultType)) {
-            shooter.results.push(resultType);
-        }
-    } else {
-        shooter.results = shooter.results.filter(r => r !== resultType);
-    }
-    
-    // Update target stats based on results
-    recalculateTargetStats(enemyIdx);
-    saveState();
-    renderBaskinList();
-}
-
-function recalculateTargetStats(enemyIdx) {
-    const item = baskinList[enemyIdx];
-    if (!item.stats) item.stats = {};
-    
-    let totalBgDead = 0;
-    let suitHit = false;
-    let bloodHit = false;
-    
-    item.shooters.forEach(s => {
-        const results = s.results || [];
-        results.forEach(r => {
-            if (r === '-1bg') totalBgDead += 1;
-            if (r === '-2bg') totalBgDead += 2;
-            if (r === 'suit') suitHit = true;
-            if (r === 'blood') bloodHit = true;
-        });
-    });
-    
-    item.stats.bgDead = Math.min(totalBgDead, 5);
-    if (suitHit) item.stats.suit = false;
-    if (bloodHit) item.stats.blood = false;
-}
-
-function updateShooterResult(enemyIdx, shooterIdx, value) {
-    baskinList[enemyIdx].shooters[shooterIdx].result = value;
-    saveState();
-}
-
 const bgDefaults = [
     {name:'V', atk:10, def:0},
     {name:'X', atk:10, def:0},
@@ -628,6 +584,15 @@ function cycleTargetBg(enemyIdx) {
     const st = baskinList[enemyIdx].stats;
     const current = st.bgDead || 0;
     st.bgDead = current >= 5 ? 0 : current + 1;
+    saveState();
+    renderBaskinList();
+}
+
+function cycleTargetBgBack(enemyIdx) {
+    if (!baskinList[enemyIdx].stats) baskinList[enemyIdx].stats = {};
+    const st = baskinList[enemyIdx].stats;
+    const current = st.bgDead || 0;
+    st.bgDead = current <= 0 ? 5 : current - 1;
     saveState();
     renderBaskinList();
 }
