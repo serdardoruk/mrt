@@ -194,9 +194,9 @@
 
     <!-- Fixed Footer -->
     <footer class="app-footer">
-        <span class="footer-item update-time" id="updateTime">📅 Updated: --</span>
-        <span class="footer-item current-time" id="currentTime">🕐 --:--:--</span>
-        <a href="#" class="logout-btn" id="logoutBtn">🚪 Logout</a>
+        <span class="footer-item update-time" id="updateTime">Last Refresh: --</span>
+        <span class="footer-item current-time" id="currentTime">Now: --:--:-- OT</span>
+        <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
     </footer>
 
     <script>
@@ -281,7 +281,7 @@
             const h = String(now.getUTCHours()).padStart(2, '0');
             const m = String(now.getUTCMinutes()).padStart(2, '0');
             const s = String(now.getUTCSeconds()).padStart(2, '0');
-            el.textContent = '🕐 ' + h + ':' + m + ':' + s + ' OT';
+            el.textContent = 'Now: ' + h + ':' + m + ':' + s + ' OT';
         }
         
         // Güncelleme zamanını yükle
@@ -290,7 +290,7 @@
                 const res = await fetch('data/update_time.txt');
                 if (res.ok) {
                     const time = await res.text();
-                    document.getElementById('updateTime').textContent = '📅 ' + time.trim();
+                    document.getElementById('updateTime').textContent = 'Last Refresh: ' + time.trim();
                 }
             } catch(e) {}
         }
