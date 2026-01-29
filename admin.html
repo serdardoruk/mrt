@@ -191,6 +191,22 @@
     </style>
 </head>
 <body>
+<script>
+(function(){
+    // Eğer iframe içinde değilsek, login kontrolü yap
+    if (window.self === window.top) {
+        // Doğrudan erişim - login kontrolü
+        try {
+            if (!sessionStorage.getItem('omerta_user')) {
+                window.location.href = 'index.html';
+            }
+        } catch(e) {
+            window.location.href = 'index.html';
+        }
+    }
+})();
+</script>
+
     <!-- 
     Omerta Navigation Template
     Bu dosya Python tarafından okunup her HTML sayfasına eklenir.

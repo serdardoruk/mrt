@@ -127,6 +127,22 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </style>
 </head>
 <body>
+<script>
+(function(){
+    // Eğer iframe içinde değilsek, login kontrolü yap
+    if (window.self === window.top) {
+        // Doğrudan erişim - login kontrolü
+        try {
+            if (!sessionStorage.getItem('omerta_user')) {
+                window.location.href = 'index.html';
+            }
+        } catch(e) {
+            window.location.href = 'index.html';
+        }
+    }
+})();
+</script>
+
 
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
