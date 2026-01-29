@@ -61,37 +61,59 @@
             font-size: 14px; 
             font-weight: 700; 
         }
-        .update-time {
+        .current-time {
             color: #94a3b8;
-            font-size: 11px;
+            font-size: 12px;
+            font-family: monospace;
             background: rgba(0,0,0,0.2);
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
         }
+        
+        /* Footer */
+        .app-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+        }
         .logout-btn { 
-            position: absolute !important; 
-            right: 12px; 
-            height: 32px !important; 
-            padding: 0 10px !important; 
-            background: transparent !important; 
-            border: 1px solid #475569 !important; 
-            color: #94a3b8 !important; 
+            height: 28px;
+            padding: 0 16px;
+            background: transparent;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
         .logout-btn:hover { 
-            background: #dc2626 !important; 
-            border-color: #dc2626 !important; 
-            color: #fff !important; 
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #fff;
         }
         
         /* Content area */
         .app-content {
             margin-top: 50px;
-            min-height: calc(100vh - 50px);
+            margin-bottom: 40px;
+            min-height: calc(100vh - 90px);
         }
         
         .app-content iframe {
             width: 100%;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 90px);
             border: none;
         }
         
@@ -107,19 +129,19 @@
         /* Mobile */
         @media (max-width: 768px) {
             .top-nav { 
-                top: auto; 
-                bottom: 0; 
-                height: 60px; 
+                height: 50px; 
+            }
+            .app-footer {
+                height: 50px;
             }
             .app-content {
-                margin-top: 0;
-                margin-bottom: 60px;
+                margin-top: 50px;
+                margin-bottom: 50px;
             }
             .app-content iframe {
-                height: calc(100vh - 60px);
+                height: calc(100vh - 100px);
             }
             .header-left { display: none; }
-            .logout-btn { position: relative !important; right: auto !important; }
         }
     </style>
 </head>
@@ -139,19 +161,23 @@
     <nav class="top-nav">
         <div class="header-left">
             <span class="omerta-timer" id="omertaTimer"></span>
-            <span class="update-time" id="updateTime">🕐 --</span>
+            <span class="current-time" id="currentTime">🕐 --:--:--</span>
         </div>
         <a href="#matchings" data-page="matchings"><span>⚔️</span><span class="nav-label">Savaş</span></a>
         <a href="#baskin" data-page="baskin"><span>🎯</span><span class="nav-label">Baskın</span></a>
         <a href="#roster" data-page="roster"><span>👥</span><span class="nav-label">Aileler</span></a>
         <a href="#admin" data-page="admin" id="adminLink" style="display:none;"><span>⚙️</span><span class="nav-label">Admin</span></a>
-        <a href="#" class="logout-btn" id="logoutBtn"><span>🚪</span><span class="nav-label">Çıkış</span></a>
     </nav>
 
     <!-- Dinamik İçerik Alanı -->
     <main class="app-content" id="appContent">
         <div class="loading">Yükleniyor...</div>
     </main>
+
+    <!-- Sabit Footer -->
+    <footer class="app-footer">
+        <a href="#" class="logout-btn" id="logoutBtn"><span>🚪</span><span>Çıkış Yap</span></a>
+    </footer>
 
     <script>
         // Sayfa eşlemeleri
@@ -226,17 +252,15 @@
             } catch(e) {}
         }
         
-        // Update time yükle
-        async function loadUpdateTime() {
-            try {
-                const res = await fetch('data/update_time.txt');
-                if (res.ok) {
-                    const time = await res.text();
-                    document.getElementById('updateTime').textContent = '🕐 ' + time.trim();
-                }
-            } catch(e) {
-                // Sessizce başarısız ol
-            }
+        // Güncel saat (UTC/Omerta Time)
+        function updateCurrentTime() {
+            const el = document.getElementById('currentTime');
+            if (!el) return;
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            el.textContent = '🕐 ' + h + ':' + m + ':' + s + ' OT';
         }
         
         // Logout
@@ -250,8 +274,9 @@
         window.addEventListener('hashchange', handleHash);
         setupAdmin();
         updateTimer();
+        updateCurrentTime();
         setInterval(updateTimer, 1000);
-        loadUpdateTime();
+        setInterval(updateCurrentTime, 1000);
         handleHash();
     </script>
 </body>
