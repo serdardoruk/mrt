@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Omerta Admin Panel</title>
+    <script>
+        // Admin kontrolü
+        const user = sessionStorage.getItem('omerta_user');
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            const userData = JSON.parse(user);
+            if (userData.username !== 'admin') {
+                alert('Bu sayfaya sadece admin erişebilir!');
+                window.location.href = 'matchings_latest.html';
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f6f8fc, #eef2f7);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 70px;
+        }
+        
+        .top-nav { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 50px; 
+            background: #0f172a; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            z-index: 9999; 
+            padding: 0 20px; 
+        }
+        .top-nav a { 
+            height: 36px; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            padding: 0 14px; 
+            border-radius: 8px; 
+            background: #1e293b; 
+            color: #94a3b8; 
+            text-decoration: none; 
+            font-size: 14px; 
+            transition: all 0.2s; 
+        }
+        .top-nav a:hover { background: #334155; color: #fff; }
+        .top-nav a.active { background: #2563eb; color: #fff; }
+        .top-nav a span { font-size: 16px; }
+        .top-nav .nav-label { display: inline; font-size: 13px; font-weight: 600; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #0f172a; margin-bottom: 24px; text-align: center; }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .section h2 {
+            color: #0f172a;
+            margin-bottom: 16px;
+            font-size: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .add-user-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        button:hover { transform: translateY(-1px); }
+        
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+        
+        .user-code {
+            background: #0f172a;
+            color: #22c55e;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 12px;
+        }
+        
+        .info-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-admin { background: #fef3c7; color: #92400e; }
+        .badge-user { background: #e0e7ff; color: #3730a3; }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; padding-top: 60px; padding-bottom: 80px; }
+            .top-nav { top: auto; bottom: 0; height: 60px; }
+            .container { padding: 0; }
+            h1 { font-size: 20px; margin-bottom: 16px; }
+            .section { padding: 14px; margin-bottom: 14px; }
+            .section h2 { font-size: 16px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px 6px; }
+            .add-user-form { flex-direction: column; }
+            .form-group { min-width: 100%; }
+            .user-code { font-size: 10px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+<script>
+(function(){
+    // Eğer iframe içinde değilsek, login kontrolü yap
+    if (window.self === window.top) {
+        // Doğrudan erişim - login kontrolü
+        try {
+            if (!sessionStorage.getItem('omerta_user')) {
+                window.location.href = 'index.html';
+            }
+        } catch(e) {
+            window.location.href = 'index.html';
+        }
+    }
+})();
+</script>
+
+    <!-- 
+    Omerta Navigation Template
+    Bu dosya Python tarafından okunup her HTML sayfasına eklenir.
+    Yeni sayfa eklemek için burayı güncelle, Python otomatik tüm sayfalara uygular.
+-->
+
+<!-- 
+    Omerta Navigation Template
+    Bu dosya Python tarafından okunup her HTML sayfasına eklenir.
+    Yeni sayfa eklemek için burayı güncelle, Python otomatik tüm sayfalara uygular.
+-->
+
+<!-- 
+    Omerta Navigation Template
+    Bu dosya Python tarafından okunup her HTML sayfasına eklenir.
+    Yeni sayfa eklemek için burayı güncelle, Python otomatik tüm sayfalara uygular.
+-->
+
+
+
+
+
+
+
+
+    
+    <div class="container">
+        <h1>⚙️ Admin Panel</h1>
+        
+        <!-- Giriş Geçmişi -->
+        <div class="section">
+            <h2>📊 Son Giriş Yapanlar</h2>
+            <div class="info-box">
+                🔥 Tüm cihazlardan yapılan girişler Firebase'den yükleniyor.
+            </div>
+            <div style="margin-bottom:12px;">
+                <button class="btn-secondary" onclick="loadLoginHistory()" style="margin-right:8px;">🔄 Yenile</button>
+                <button class="btn-danger" onclick="deleteSelected()" style="margin-right:8px;">🗑️ Seçilenleri Sil</button>
+                <button class="btn-danger" onclick="clearHistory()">🗑️ Tümünü Sil</button>
+                <span id="login-count" style="color:#64748b;font-size:13px;margin-left:12px;"></span>
+            </div>
+            <table id="login-history-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
+                        <th>Kullanıcı</th>
+                        <th>Tarih / Saat</th>
+                        <th>Konum</th>
+                        <th>Tarayıcı</th>
+                        <th>Platform</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="login-history-body">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Yeni Kullanıcı Ekleme -->
+        <div class="section">
+            <h2>👤 Yeni Kullanıcı Ekle</h2>
+            <div class="info-box">
+                🔥 Kullanıcılar Firebase'de tutulur. Buradan ekleyince hemen aktif olur!
+            </div>
+            
+            <div class="add-user-form">
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" id="new-username" placeholder="ornek: ahmet">
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="new-password" placeholder="Güçlü bir şifre girin">
+                </div>
+                <button class="btn-primary" onclick="addUser()">➕ Kullanıcı Ekle</button>
+            </div>
+            <div id="add-user-status" style="margin-top:12px;display:none;"></div>
+        </div>
+        
+        <!-- Mevcut Kullanıcılar -->
+        <div class="section">
+            <h2>📋 Mevcut Kullanıcılar</h2>
+            <div style="margin-bottom:12px;">
+                <button class="btn-secondary" onclick="loadUsers()">🔄 Yenile</button>
+            </div>
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kullanıcı Adı</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="users-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // SHA-512 hash fonksiyonu
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        // Firebase URL
+        const FIREBASE_URL = 'https://omerta-war-default-rtdb.firebaseio.com';
+        
+        // Giriş geçmişini Firebase'den yükle
+        async function loadLoginHistory() {
+            const tbody = document.getElementById('login-history-body');
+            const countSpan = document.getElementById('login-count');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Yükleniyor...</td></tr>';
+            
+            try {
+                const res = await fetch(`${FIREBASE_URL}/loginHistory.json`);
+                const data = await res.json();
+                
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Henüz giriş kaydı yok</td></tr>';
+                    countSpan.textContent = '';
+                    return;
+                }
+                
+                // Firebase object'i array'e çevir ve tarihe göre sırala
+                const history = Object.entries(data).map(([id, entry]) => ({ id, ...entry }));
+                history.sort((a, b) => new Date(b.time) - new Date(a.time));
+                
+                countSpan.textContent = `Toplam ${history.length} giriş kaydı`;
+                tbody.innerHTML = '';
+                
+                // Son 100 girişi göster
+                history.slice(0, 100).forEach((entry, index) => {
+                    const date = new Date(entry.time);
+                    const formattedDate = date.toLocaleString('tr-TR');
+                    
+                    // User agent'ı kısalt
+                    let browser = 'Bilinmiyor';
+                    if (entry.userAgent) {
+                        if (entry.userAgent.includes('CriOS')) browser = '🌐 Chrome iOS';
+                        else if (entry.userAgent.includes('Edg')) browser = '🌐 Edge';
+                        else if (entry.userAgent.includes('Chrome')) browser = '🌐 Chrome';
+                        else if (entry.userAgent.includes('Firefox')) browser = '🦊 Firefox';
+                        else if (entry.userAgent.includes('Safari')) browser = '🧭 Safari';
+                    }
+                    
+                    // Platform kısalt
+                    let platform = entry.platform || '-';
+                    if (platform.includes('Mac')) platform = '🍎 Mac';
+                    else if (platform.includes('Win')) platform = '🪟 Windows';
+                    else if (platform.includes('Linux')) platform = '🐧 Linux';
+                    else if (platform.includes('iPhone')) platform = '📱 iPhone';
+                    else if (platform.includes('Android')) platform = '📱 Android';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="log-checkbox" data-id="${entry.id}"></td>
+                        <td><strong>${entry.username}</strong></td>
+                        <td>${formattedDate}</td>
+                        <td>📍 ${entry.location || 'Bilinmiyor'}</td>
+                        <td>${browser}</td>
+                        <td>${platform}</td>
+                        <td><button class="btn-danger" onclick="deleteLog('${entry.id}')" style="padding:2px 8px;font-size:11px;">✖</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error('[loadLoginHistory] Firebase error:', e);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
+            }
+        }
+        
+        // Firebase geçmişini temizle
+        async function clearHistory() {
+            if (confirm('⚠️ TÜM giriş geçmişi Firebase\'den silinecek. Emin misiniz?')) {
+                try {
+                    await fetch(`${FIREBASE_URL}/loginHistory.json`, { method: 'DELETE' });
+                    loadLoginHistory();
+                    alert('Geçmiş temizlendi!');
+                } catch (e) {
+                    console.error('[clearHistory] Firebase error:', e);
+                    alert('Firebase silme hatası!');
+                }
+            }
+        }
+        
+        // Tek log sil
+        async function deleteLog(id) {
+            try {
+                await fetch(`${FIREBASE_URL}/loginHistory/${id}.json`, { method: 'DELETE' });
+                loadLoginHistory();
+            } catch (e) {
+                console.error('[deleteLog] Firebase error:', e);
+                alert('Silme hatası!');
+            }
+        }
+        
+        // Seçilenleri sil
+        async function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.log-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Silmek için kayıt seçin!');
+                return;
+            }
+            
+            if (!confirm(`${checkboxes.length} kayıt silinecek. Emin misiniz?`)) {
+                return;
+            }
+            
+            try {
+                for (const cb of checkboxes) {
+                    await fetch(`${FIREBASE_URL}/loginHistory/${cb.dataset.id}.json`, { method: 'DELETE' });
+                }
+                loadLoginHistory();
+            } catch (e) {
+                console.error('[deleteSelected] Firebase error:', e);
+                alert('Silme hatası!');
+            }
+        }
+        
+        // Tümünü seç/kaldır
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.log-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+        
+        // Kullanıcıları Firebase'den yükle
+        async function loadUsers() {
+            const tbody = document.getElementById('users-body');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;">Yükleniyor...</td></tr>';
+            
+            try {
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const data = await res.json();
+                
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;">Henüz kullanıcı yok</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                const users = Object.keys(data);
+                users.forEach((username, index) => {
+                    const row = document.createElement('tr');
+                    const isProtected = username === 'admin';
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${username}</strong> ${isProtected ? '<span class="badge badge-admin">Korumalı</span>' : ''}</td>
+                        <td>${isProtected ? '-' : `<button class="btn-danger" onclick="deleteUser('${username}')" style="padding:4px 10px;font-size:12px;">🗑️ Sil</button>`}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error('[loadUsers] Firebase error:', e);
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#dc2626;">Firebase yükleme hatası!</td></tr>';
+            }
+        }
+        
+        // Yeni kullanıcı ekle
+        async function addUser() {
+            const username = document.getElementById('new-username').value.trim().toLowerCase();
+            const password = document.getElementById('new-password').value;
+            const status = document.getElementById('add-user-status');
+            
+            if (!username || !password) {
+                alert('Kullanıcı adı ve şifre gerekli!');
+                return;
+            }
+            
+            if (password.length < 4) {
+                alert('Şifre en az 4 karakter olmalı!');
+                return;
+            }
+            
+            const hash = await hashPassword(password);
+            
+            try {
+                // Mevcut kullanıcıları çek
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const users = await res.json() || {};
+                
+                if (users[username]) {
+                    alert('Bu kullanıcı adı zaten mevcut!');
+                    return;
+                }
+                
+                // Yeni kullanıcıyı ekle
+                users[username] = hash;
+                
+                await fetch(`${FIREBASE_URL}/users.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(users)
+                });
+                
+                status.innerHTML = '<span style="color:#16a34a;">✅ Kullanıcı eklendi: ' + username + '</span>';
+                status.style.display = 'block';
+                
+                document.getElementById('new-username').value = '';
+                document.getElementById('new-password').value = '';
+                
+                loadUsers();
+            } catch (e) {
+                console.error('[addUser] Firebase error:', e);
+                alert('Firebase kaydetme hatası!');
+            }
+        }
+        
+        // Kullanıcı sil
+        async function deleteUser(username) {
+            if (username === 'admin') {
+                alert('Bu kullanıcı silinemez!');
+                return;
+            }
+            
+            if (!confirm(`"${username}" kullanıcısı silinecek. Emin misiniz?`)) {
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${FIREBASE_URL}/users.json`);
+                const users = await res.json() || {};
+                
+                delete users[username];
+                
+                await fetch(`${FIREBASE_URL}/users.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(users)
+                });
+                
+                loadUsers();
+                alert('Kullanıcı silindi!');
+            } catch (e) {
+                console.error('[deleteUser] Firebase error:', e);
+                alert('Firebase silme hatası!');
+            }
+        }
+        
+        // Sayfa yüklendiğinde
+        loadLoginHistory();
+        loadUsers();
+    </script>
+</body>
+</html>
