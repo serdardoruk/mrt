@@ -49,19 +49,6 @@
         .top-nav a.active { background: #2563eb; color: #fff; }
         .top-nav a span:first-child { font-size: 16px; }
         .nav-label { font-size: 13px; font-weight: 600; }
-        .header-left {
-            position: absolute;
-            left: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .omerta-timer { 
-            color: #b45309; 
-            font-family: monospace; 
-            font-size: 14px; 
-            font-weight: 700; 
-        }
         
         /* Footer */
         .app-footer {
@@ -160,7 +147,6 @@
             .app-content iframe {
                 height: calc(100vh - 110px);
             }
-            .header-left { display: none; }
         }
     </style>
 </head>
@@ -178,9 +164,6 @@
 
     <!-- Fixed Header -->
     <nav class="top-nav">
-        <div class="header-left">
-            <span class="omerta-timer" id="omertaTimer"></span>
-        </div>
         <a href="#matchings" data-page="matchings"><span>⚔️</span><span class="nav-label">War</span></a>
         <a href="#baskin" data-page="baskin" id="raidLink" style="display:none;"><span>🎯</span><span class="nav-label">Raid</span></a>
         <a href="#roster" data-page="roster"><span>👥</span><span class="nav-label">Families</span></a>
@@ -241,27 +224,6 @@
             loadPage(hash);
         }
         
-        // Omerta timer
-        function updateTimer() {
-            const el = document.getElementById('omertaTimer');
-            if (!el) return;
-            const now = new Date();
-            const utc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 
-                                  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
-            const hours = [0, 4, 8, 12, 16, 20];
-            const todayMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-            let nextOmerta = null;
-            for (let h of hours) {
-                const t = todayMidnight + h * 3600000;
-                if (t > utc) { nextOmerta = t; break; }
-            }
-            if (!nextOmerta) nextOmerta = todayMidnight + 24 * 3600000;
-            const diff = nextOmerta - utc;
-            const m = Math.floor(diff / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            el.textContent = '⏱ ' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-        }
-        
         // Admin link göster
         function setupAdmin() {
             try {
@@ -305,10 +267,8 @@
         // Başlat
         window.addEventListener('hashchange', handleHash);
         setupAdmin();
-        updateTimer();
         updateCurrentTime();
         loadUpdateTime();
-        setInterval(updateTimer, 1000);
         setInterval(updateCurrentTime, 1000);
         handleHash();
     </script>
