@@ -289,7 +289,7 @@
                     loginTime: new Date().toISOString()
                 }));
                 
-                window.location.href = 'matchings_latest.html';
+                window.location.href = 'app.html#matchings';
             } else {
                 // Giriş başarısız
                 errorMsg.classList.add('show');
@@ -393,7 +393,7 @@
         
         // Zaten giriş yapmışsa direkt yönlendir
         if (sessionStorage.getItem('omerta_user')) {
-            window.location.href = 'matchings_latest.html';
+            window.location.href = 'app.html#matchings';
         }
         
         // Sayfa yüklendiğinde kullanıcıları Firebase'den çek
