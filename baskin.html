@@ -108,7 +108,7 @@ h1 { text-align: center; margin-bottom: 12px; font-size: 20px; }
 </nav>
 
 <div id="admin-build-info" style="display:none; position:fixed; bottom:5px; left:5px; background:rgba(0,0,0,0.7); color:#4ade80; padding:4px 8px; border-radius:4px; font-size:10px; font-family:monospace; z-index:9999;">
-    🚀 BG text instead of emoji
+    🚀 -1 BG format
 </div>
 <script>
 try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-build-info').style.display='block';}catch(e){}
@@ -116,7 +116,7 @@ try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.usernam
 
 <div class="page">
     <h1>🎯 Raid Planner</h1>
-    <div class="update-time">🕐 28.01.2026 22:54 OT</div>
+    <div class="update-time">🕐 29.01.2026 00:16 OT</div>
     
     <div class="controls">
         <div class="search-wrap">
@@ -272,9 +272,9 @@ function renderBaskinList() {
                         <span class="enemy-meta">${e.Family} ${e.Rank}</span>
                         <div class="stats-inline">
                             <span class="target-bg-count ${(st.bgDead || 0) > 0 ? 'has-dead' : ''}" onclick="cycleTargetBg(${idx})" title="Click: +1 dead BG">${(st.bgDead || 0) > 0 ? '-' + st.bgDead + ' BG' : '5 BG'}</span>
-                            <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">🛡️</button>
-                            <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">🩸</button>
-                            <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">🏠</button>
+                            <button class="stat-btn suit ${st.suit !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'suit')" title="Çelik Yelek">Suit</button>
+                            <button class="stat-btn blood ${st.blood !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'blood')" title="Blood Alım">Blood</button>
+                            <button class="stat-btn sh ${st.sh !== false ? 'active' : 'inactive'}" onclick="toggleStat(${idx},'sh')" title="Safe House">SH</button>
                         </div>
                     </div>
                     <button class="add-shooter-btn" onclick="openShooterModal(${idx})">+ Shooter</button>
