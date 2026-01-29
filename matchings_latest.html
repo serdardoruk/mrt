@@ -19,7 +19,7 @@ button:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(37,99,23
 .top-nav { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #0f172a; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; z-index: 9999; padding: 0 20px; }
 .top-nav a { height: 36px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; border-radius: 8px; background: #1e293b; color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.2s; }
 .top-nav a:hover { background: #334155; color: #fff; }
-.top-nav a.active { background: #e94560; color: #fff; }
+.top-nav a.active { background: #2563eb; color: #fff; }
 .top-nav a span { font-size: 16px; }
 .top-nav .nav-label { display: inline; font-size: 13px; font-weight: 600; }
 .omerta-timer { position: absolute; left: 12px; color: #fbbf24; font-family: monospace; font-size: 14px; font-weight: 700; }
@@ -183,7 +183,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 <script>(function(){function updateOmertaTimer(){const el=document.getElementById('omertaTimer');if(!el)return;const now=new Date();const utc=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds());const hours=[0,4,8,12,16,20];const todayMidnight=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate());let nextOmerta=null;for(let h of hours){const t=todayMidnight+h*3600000;if(t>utc){nextOmerta=t;break;}}if(!nextOmerta)nextOmerta=todayMidnight+24*3600000;const diff=nextOmerta-utc;const m=Math.floor(diff/60000);const s=Math.floor((diff%60000)/1000);el.textContent='⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}updateOmertaTimer();setInterval(updateOmertaTimer,1000);})();</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 29.01.2026 17:24 OT</div>
+<div class='update-time'>🕐 29.01.2026 17:29 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
