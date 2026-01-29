@@ -22,6 +22,7 @@ button:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(37,99,23
 .top-nav a.active { background: #e94560; color: #fff; }
 .top-nav a span { font-size: 16px; }
 .top-nav .nav-label { display: inline; font-size: 13px; font-weight: 600; }
+.omerta-timer { position: absolute; left: 12px; color: #fbbf24; font-family: monospace; font-size: 14px; font-weight: 700; }
 .logout-btn { position: absolute !important; right: 12px; height: 32px !important; padding: 0 10px !important; font-size: 12px !important; background: transparent !important; border: 1px solid #475569 !important; color: #94a3b8 !important; }
 .logout-btn:hover { background: #dc2626 !important; border-color: #dc2626 !important; color: #fff !important; }
 .logout-btn .nav-label { font-size: 11px !important; }
@@ -162,11 +163,12 @@ input.default-target { width: 72px; margin-left: 6px; }
 </style></head><body>
 <div id='picker-overlay' class='picker-overlay'></div>
 <div id='picker-modal-container'></div>
-<nav class='top-nav'><a href='matchings_latest.html' class='active'><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='baskin.html' class=''><span>🎯</span><span class='nav-label'>Baskın</span></a><a href='family_roster_latest.html'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='admin.html' id='admin-link' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
+<nav class='top-nav'><span class='omerta-timer' id='omertaTimer'></span><a href='matchings_latest.html' class='active'><span>⚔️</span><span class='nav-label'>Savaş</span></a><a href='baskin.html' class=''><span>🎯</span><span class='nav-label'>Baskın</span></a><a href='family_roster_latest.html'><span>👥</span><span class='nav-label'>Aileler</span></a><a href='admin.html' id='admin-link' style='display:none;'><span>⚙️</span><span class='nav-label'>Admin</span></a><a href='#' class='logout-btn' onclick='sessionStorage.removeItem("omerta_user");window.location.href="index.html";return false;'><span>🚪</span><span class='nav-label'>Çıkış</span></a></nav>
 <script>try{const u=JSON.parse(sessionStorage.getItem('omerta_user')||'{}');if(u.username==='admin')document.getElementById('admin-link').style.display='flex';}catch(e){}</script>
+<script>(function(){function updateOmertaTimer(){const el=document.getElementById('omertaTimer');if(!el)return;const now=new Date();const utc=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds());const hours=[0,4,8,12,16,20];const todayMidnight=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate());let nextOmerta=null;for(let h of hours){const t=todayMidnight+h*3600000;if(t>utc){nextOmerta=t;break;}}if(!nextOmerta)nextOmerta=todayMidnight+24*3600000;const diff=nextOmerta-utc;const m=Math.floor(diff/60000);const s=Math.floor((diff%60000)/1000);el.textContent='⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}updateOmertaTimer();setInterval(updateOmertaTimer,1000);})();</script>
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 29.01.2026 01:58 OT</div>
+<div class='update-time'>🕐 29.01.2026 02:08 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
