@@ -61,14 +61,6 @@
             font-size: 14px; 
             font-weight: 700; 
         }
-        .current-time {
-            color: #94a3b8;
-            font-size: 12px;
-            font-family: monospace;
-            background: rgba(0,0,0,0.2);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
         
         /* Footer */
         .app-footer {
@@ -76,26 +68,43 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 40px;
+            height: 36px;
             background: linear-gradient(135deg, #1e293b, #334155);
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 20px;
             z-index: 9998;
             box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
-        }
-        .logout-btn { 
-            height: 28px;
             padding: 0 16px;
-            background: transparent;
-            border: 1px solid #475569;
-            border-radius: 6px;
+        }
+        .footer-item {
             color: #94a3b8;
-            text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
+            font-family: monospace;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+        }
+        .footer-item.update-time {
+            color: #64748b;
+        }
+        .footer-item.current-time {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .logout-btn { 
+            height: 24px;
+            padding: 0 12px;
+            background: transparent;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
             transition: all 0.2s;
         }
         .logout-btn:hover { 
@@ -161,7 +170,6 @@
     <nav class="top-nav">
         <div class="header-left">
             <span class="omerta-timer" id="omertaTimer"></span>
-            <span class="current-time" id="currentTime">🕐 --:--:--</span>
         </div>
         <a href="#matchings" data-page="matchings"><span>⚔️</span><span class="nav-label">Savaş</span></a>
         <a href="#baskin" data-page="baskin"><span>🎯</span><span class="nav-label">Baskın</span></a>
@@ -176,7 +184,9 @@
 
     <!-- Sabit Footer -->
     <footer class="app-footer">
-        <a href="#" class="logout-btn" id="logoutBtn"><span>🚪</span><span>Çıkış Yap</span></a>
+        <span class="footer-item update-time" id="updateTime">📅 Güncelleme: --</span>
+        <span class="footer-item current-time" id="currentTime">🕐 --:--:--</span>
+        <a href="#" class="logout-btn" id="logoutBtn">🚪 Çıkış</a>
     </footer>
 
     <script>
@@ -263,6 +273,17 @@
             el.textContent = '🕐 ' + h + ':' + m + ':' + s + ' OT';
         }
         
+        // Güncelleme zamanını yükle
+        async function loadUpdateTime() {
+            try {
+                const res = await fetch('data/update_time.txt');
+                if (res.ok) {
+                    const time = await res.text();
+                    document.getElementById('updateTime').textContent = '📅 ' + time.trim();
+                }
+            } catch(e) {}
+        }
+        
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
@@ -275,6 +296,7 @@
         setupAdmin();
         updateTimer();
         updateCurrentTime();
+        loadUpdateTime();
         setInterval(updateTimer, 1000);
         setInterval(updateCurrentTime, 1000);
         handleHash();
