@@ -184,7 +184,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 31.01.2026 10:43 OT</div>
+<div class='update-time'>🕐 31.01.2026 10:50 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -369,6 +369,8 @@ input.default-target { width: 72px; margin-left: 6px; }
     let maxAlliesVal = defaults.maxAllies;
     let maxPerAllyVal = defaults.maxPerAlly;
     let lastAllyPool = [];
+    let lastAllyList = [];
+    let lastEnemyList = [];
 
     const normalizeName = (name) => String(name || '').trim();
     const slugifyId = (name) => {
@@ -1261,16 +1263,19 @@ input.default-target { width: 72px; margin-left: 6px; }
         if (!wrap) return;
         const posSafe = v => (v === '' || v === null || Number.isNaN(Number(v))) ? 1e9 : Number(v);
 
-        const allyList = allPlayers
+        lastAllyList = allPlayers
             .filter(m => allyFamilies.has(String(m.Family)))
             .filter(m => memberRankFilter.ally.size === 0 || memberRankFilter.ally.has(String(m.Rank)))
             .filter(m => !excludedAllies.has(m.Name))
             .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
 
-        const enemyList = allPlayers
+        lastEnemyList = allPlayers
             .filter(m => enemyFamilies.has(String(m.Family)))
             .filter(m => memberRankFilter.enemy.size === 0 || memberRankFilter.enemy.has(String(m.Rank)))
             .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
+
+        const allyList = lastAllyList;
+        const enemyList = lastEnemyList;
 
         const fmtRow = m => {
             const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
@@ -1332,7 +1337,7 @@ input.default-target { width: 72px; margin-left: 6px; }
                 ];
                 
                 // Blood sheet
-                const bloodRows = allyList.map(m => ({
+                const bloodRows = lastAllyList.map(m => ({
                     'İsim': m.Name || '',
                     'Pos': Number(m.Pos) || '',
                     'Aile': m.Family || '',
@@ -1345,7 +1350,7 @@ input.default-target { width: 72px; margin-left: 6px; }
                 }
                 
                 // Düşman sheet
-                const enemyRows = enemyList.map(m => ({
+                const enemyRows = lastEnemyList.map(m => ({
                     'İsim': m.Name || '',
                     'Pos': Number(m.Pos) || '',
                     'Aile': m.Family || '',
@@ -1366,8 +1371,8 @@ input.default-target { width: 72px; margin-left: 6px; }
                 combinedData.push(['İsim', 'Pos', 'Aile', 'Rank', '', 'İsim', 'Pos', 'Aile', 'Rank']);
                 
                 for (let i = 0; i < maxLen; i++) {
-                    const b = allyList[i] || {};
-                    const e = enemyList[i] || {};
+                    const b = lastAllyList[i] || {};
+                    const e = lastEnemyList[i] || {};
                     combinedData.push([
                         b.Name || '',
                         b.Pos ? Number(b.Pos) : '',
@@ -1510,4 +1515,4 @@ input.default-target { width: 72px; margin-left: 6px; }
         console.log('[init] Done');
     })();
     </script>
-</body></html><!-- v1769856480 -->
+</body></html>
