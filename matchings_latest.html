@@ -184,7 +184,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 31.01.2026 10:36 OT</div>
+<div class='update-time'>🕐 31.01.2026 10:39 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -1304,12 +1304,77 @@ input.default-target { width: 72px; margin-left: 6px; }
                     </div>
                     <div class="bottom-list">${enemyList.map(fmtRow).join('')}</div>
                 </div>
+            </div>
+            <div style="text-align:center; margin-top:12px;">
+                <button id="exportListsExcelBtn" style="background:#16a34a; color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:700; cursor:pointer;">📊 Excel İndir (Blood + Düşman)</button>
             </div>`;
 
         const copyAlliesBtn = document.getElementById('copyBottomAlliesBtn');
         if (copyAlliesBtn) copyAlliesBtn.onclick = () => copyBottomList('Blood', allyList);
         const copyEnemiesBtn = document.getElementById('copyBottomEnemiesBtn');
         if (copyEnemiesBtn) copyEnemiesBtn.onclick = () => copyBottomList('Düşman', enemyList);
+        
+        // Excel export for bottom lists
+        const exportListsBtn = document.getElementById('exportListsExcelBtn');
+        if (exportListsBtn) {
+            exportListsBtn.onclick = () => {
+                const wb = XLSX.utils.book_new();
+                
+                // Blood sheet
+                const bloodRows = allyList.map(m => ({
+                    'İsim': m.Name || '',
+                    'Pos': Number(m.Pos) || '',
+                    'Aile': m.Family || '',
+                    'Rank': m.Rank || ''
+                }));
+                if (bloodRows.length > 0) {
+                    const wsBlood = XLSX.utils.json_to_sheet(bloodRows);
+                    XLSX.utils.book_append_sheet(wb, wsBlood, 'Blood');
+                }
+                
+                // Düşman sheet
+                const enemyRows = enemyList.map(m => ({
+                    'İsim': m.Name || '',
+                    'Pos': Number(m.Pos) || '',
+                    'Aile': m.Family || '',
+                    'Rank': m.Rank || ''
+                }));
+                if (enemyRows.length > 0) {
+                    const wsEnemy = XLSX.utils.json_to_sheet(enemyRows);
+                    XLSX.utils.book_append_sheet(wb, wsEnemy, 'Düşman');
+                }
+                
+                // Combined sheet - yan yana
+                const maxLen = Math.max(bloodRows.length, enemyRows.length);
+                const combinedRows = [];
+                for (let i = 0; i < maxLen; i++) {
+                    const b = bloodRows[i] || {};
+                    const e = enemyRows[i] || {};
+                    combinedRows.push({
+                        'Blood İsim': b['İsim'] || '',
+                        'Blood Pos': b['Pos'] || '',
+                        'Blood Aile': b['Aile'] || '',
+                        'Blood Rank': b['Rank'] || '',
+                        '': '',
+                        'Düşman İsim': e['İsim'] || '',
+                        'Düşman Pos': e['Pos'] || '',
+                        'Düşman Aile': e['Aile'] || '',
+                        'Düşman Rank': e['Rank'] || ''
+                    });
+                }
+                if (combinedRows.length > 0) {
+                    const wsCombined = XLSX.utils.json_to_sheet(combinedRows);
+                    XLSX.utils.book_append_sheet(wb, wsCombined, 'Yan Yana');
+                }
+                
+                if (bloodRows.length === 0 && enemyRows.length === 0) {
+                    alert('Liste boş!');
+                    return;
+                }
+                
+                XLSX.writeFile(wb, 'omerta_listeler_' + new Date().toISOString().slice(0,10) + '.xlsx');
+            };
+        }
     }
 
     function run() {
