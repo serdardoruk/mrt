@@ -190,7 +190,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 31.01.2026 10:55 OT</div>
+<div class='update-time'>🕐 31.01.2026 11:04 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -1312,20 +1312,21 @@ input.default-target { width: 72px; margin-left: 6px; }
             const col = side === 'blood' ? bloodSortCol : enemySortCol;
             const asc = side === 'blood' ? bloodSortAsc : enemySortAsc;
             const rows = list.map(m => {
-                const posNum = posSafe(m.Pos) < 1e9 ? Math.round(Number(m.Pos)) : '';
+                const posNum = posSafe(m.Pos) < 1e9 ? Math.round(Number(m.Pos)) : null;
+                const posHtml = posNum !== null ? posBarHtml(posNum) : '';
                 const href = normHref(m.UserHref);
                 const nameHtml = href ? `<a href="${href}" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">${m.Name || ''}</a>` : `<span style="font-weight:700;">${m.Name || ''}</span>`;
                 const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
                 return `<tr>
-                    <td style="text-align:center;">${posNum}</td>
+                    <td style="text-align:center;">${posHtml}</td>
                     <td>${shieldDot(m)}${nameHtml}</td>
-                    <td style="color:${famColor}">${m.Family || ''}</td>
+                    <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
                     <td>${m.Rank || ''}</td>
                 </tr>`;
             }).join('');
             return `<table class="excel-table">
                 <thead><tr>
-                    <th data-col="Pos" data-side="${side}" style="cursor:pointer;width:60px;">Pos ${sortIcon('Pos', col, asc)}</th>
+                    <th data-col="Pos" data-side="${side}" style="cursor:pointer;width:80px;">Pos ${sortIcon('Pos', col, asc)}</th>
                     <th data-col="Name" data-side="${side}" style="cursor:pointer;">İsim ${sortIcon('Name', col, asc)}</th>
                     <th data-col="Family" data-side="${side}" style="cursor:pointer;">Aile ${sortIcon('Family', col, asc)}</th>
                     <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
