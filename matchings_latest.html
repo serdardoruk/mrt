@@ -123,7 +123,13 @@ input.default-target { width: 72px; margin-left: 6px; }
 .bottom-line { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 10px; background: rgba(37,99,235,0.08); border: 1px solid #cbd5e1; color: #0f172a; width: 100%; box-sizing: border-box; }
 .bottom-name { font-weight: 800; }
 .bottom-meta { color: #475569; font-size: 12px; margin-left: 6px; }
-.bottom-block { max-width: 1080px; margin: 0 auto; }
+.bottom-block { max-width: 1280px; margin: 0 auto; }
+.excel-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.excel-table th { background: #1e293b; color: #fff; padding: 8px 10px; text-align: left; font-weight: 700; border: 1px solid #334155; user-select: none; }
+.excel-table th:hover { background: #334155; }
+.excel-table td { padding: 6px 10px; border: 1px solid #e2e8f0; background: #fff; }
+.excel-table tr:nth-child(even) td { background: #f8fafc; }
+.excel-table tr:hover td { background: #dbeafe; }
 .dual-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, max-content)); grid-auto-columns: max-content; gap: 12px; justify-content: center; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
 .col-stack { display: flex; flex-direction: column; gap: 12px; }
 .rank-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, max-content)); grid-auto-columns: max-content; justify-content: center; gap: 10px; margin-top: 8px; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
@@ -184,7 +190,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 31.01.2026 10:52 OT</div>
+<div class='update-time'>🕐 31.01.2026 10:55 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -1258,6 +1264,11 @@ input.default-target { width: 72px; margin-left: 6px; }
         copyText(text, `${label} listesi kopyalandı`);
     }
 
+    let bloodSortCol = 'Pos';
+    let bloodSortAsc = true;
+    let enemySortCol = 'Pos';
+    let enemySortAsc = true;
+
     function renderBottomLists() {
         const wrap = document.getElementById('bottomLists');
         if (!wrap) return;
@@ -1266,28 +1277,61 @@ input.default-target { width: 72px; margin-left: 6px; }
         lastAllyList = allPlayers
             .filter(m => allyFamilies.has(String(m.Family)))
             .filter(m => memberRankFilter.ally.size === 0 || memberRankFilter.ally.has(String(m.Rank)))
-            .filter(m => !excludedAllies.has(m.Name))
-            .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
+            .filter(m => !excludedAllies.has(m.Name));
 
         lastEnemyList = allPlayers
             .filter(m => enemyFamilies.has(String(m.Family)))
-            .filter(m => memberRankFilter.enemy.size === 0 || memberRankFilter.enemy.has(String(m.Rank)))
-            .sort((a, b) => posSafe(a.Pos) - posSafe(b.Pos) || (a.Name || '').localeCompare(b.Name || ''));
+            .filter(m => memberRankFilter.enemy.size === 0 || memberRankFilter.enemy.has(String(m.Rank)));
 
-        const allyList = lastAllyList;
-        const enemyList = lastEnemyList;
+        // Sort functions
+        const sortList = (list, col, asc) => {
+            const sorted = [...list];
+            sorted.sort((a, b) => {
+                let va, vb;
+                if (col === 'Pos') { va = posSafe(a.Pos); vb = posSafe(b.Pos); }
+                else if (col === 'Name') { va = (a.Name || '').toLowerCase(); vb = (b.Name || '').toLowerCase(); }
+                else if (col === 'Family') { va = (a.Family || '').toLowerCase(); vb = (b.Family || '').toLowerCase(); }
+                else if (col === 'Rank') { va = (a.Rank || '').toLowerCase(); vb = (b.Rank || '').toLowerCase(); }
+                else { va = a[col]; vb = b[col]; }
+                if (va < vb) return asc ? -1 : 1;
+                if (va > vb) return asc ? 1 : -1;
+                return 0;
+            });
+            return sorted;
+        };
 
-        const fmtRow = m => {
-            const posNum = (m.Pos !== undefined && m.Pos !== null && m.Pos !== '' && !Number.isNaN(Number(m.Pos))) ? Math.round(Number(m.Pos)) : null;
-            const posHtml = posNum !== null ? posBarHtml(posNum) : '';
-            const famColor = m.Family ? pickFamColor(m.Family, 'ally') : '';
-            const famHtml = m.Family ? ` <span style="color:${famColor}">${m.Family}</span>` : '';
-            const rankStr = m.Rank ? ` ${shortRank(m.Rank)}` : '';
-            const shieldDotHtml = shieldDot(m);
-            const href = normHref(m.UserHref);
-            const linkOpen = href ? `<a href="${href}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">` : '';
-            const linkClose = href ? "</a>" : '';
-            return `<div class="bottom-line">${shieldDotHtml}${linkOpen}<span class="bottom-name">${m.Name || ''}</span>${linkClose}<span class="bottom-meta">${posHtml}${famHtml}${rankStr}</span></div>`;
+        const allyList = sortList(lastAllyList, bloodSortCol, bloodSortAsc);
+        const enemyList = sortList(lastEnemyList, enemySortCol, enemySortAsc);
+
+        const sortIcon = (col, currentCol, asc) => {
+            if (col !== currentCol) return '<span style="opacity:0.3">⇅</span>';
+            return asc ? '↑' : '↓';
+        };
+
+        const renderTable = (list, side) => {
+            const col = side === 'blood' ? bloodSortCol : enemySortCol;
+            const asc = side === 'blood' ? bloodSortAsc : enemySortAsc;
+            const rows = list.map(m => {
+                const posNum = posSafe(m.Pos) < 1e9 ? Math.round(Number(m.Pos)) : '';
+                const href = normHref(m.UserHref);
+                const nameHtml = href ? `<a href="${href}" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">${m.Name || ''}</a>` : `<span style="font-weight:700;">${m.Name || ''}</span>`;
+                const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
+                return `<tr>
+                    <td style="text-align:center;">${posNum}</td>
+                    <td>${shieldDot(m)}${nameHtml}</td>
+                    <td style="color:${famColor}">${m.Family || ''}</td>
+                    <td>${m.Rank || ''}</td>
+                </tr>`;
+            }).join('');
+            return `<table class="excel-table">
+                <thead><tr>
+                    <th data-col="Pos" data-side="${side}" style="cursor:pointer;width:60px;">Pos ${sortIcon('Pos', col, asc)}</th>
+                    <th data-col="Name" data-side="${side}" style="cursor:pointer;">İsim ${sortIcon('Name', col, asc)}</th>
+                    <th data-col="Family" data-side="${side}" style="cursor:pointer;">Aile ${sortIcon('Family', col, asc)}</th>
+                    <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
         };
 
         wrap.innerHTML = `
@@ -1295,21 +1339,37 @@ input.default-target { width: 72px; margin-left: 6px; }
                 <button id="exportListsExcelBtn" style="background:#16a34a; color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:700; cursor:pointer;">📊 Excel İndir (Blood + Düşman)</button>
             </div>
             <div class="row-grid2 bottom-block">
-                <div class="card">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                        <strong>Blood</strong>
+                <div class="card" style="overflow-x:auto;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
+                        <strong>Blood (${allyList.length})</strong>
                         <button id="copyBottomAlliesBtn" class="icon-btn">Kopyala</button>
                     </div>
-                    <div class="bottom-list">${allyList.map(fmtRow).join('')}</div>
+                    ${renderTable(allyList, 'blood')}
                 </div>
-                <div class="card">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                        <strong>Düşman</strong>
+                <div class="card" style="overflow-x:auto;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
+                        <strong>Düşman (${enemyList.length})</strong>
                         <button id="copyBottomEnemiesBtn" class="icon-btn">Kopyala</button>
                     </div>
-                    <div class="bottom-list">${enemyList.map(fmtRow).join('')}</div>
+                    ${renderTable(enemyList, 'enemy')}
                 </div>
             </div>`;
+
+        // Sort handlers
+        wrap.querySelectorAll('.excel-table th[data-col]').forEach(th => {
+            th.onclick = () => {
+                const col = th.dataset.col;
+                const side = th.dataset.side;
+                if (side === 'blood') {
+                    if (bloodSortCol === col) bloodSortAsc = !bloodSortAsc;
+                    else { bloodSortCol = col; bloodSortAsc = true; }
+                } else {
+                    if (enemySortCol === col) enemySortAsc = !enemySortAsc;
+                    else { enemySortCol = col; enemySortAsc = true; }
+                }
+                renderBottomLists();
+            };
+        });
 
         const copyAlliesBtn = document.getElementById('copyBottomAlliesBtn');
         if (copyAlliesBtn) copyAlliesBtn.onclick = () => copyBottomList('Blood', allyList);
