@@ -1286,6 +1286,9 @@ input.default-target { width: 72px; margin-left: 6px; }
         };
 
         wrap.innerHTML = `
+            <div style="text-align:center; margin-bottom:12px;">
+                <button id="exportListsExcelBtn" style="background:#16a34a; color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:700; cursor:pointer;">📊 Excel İndir (Blood + Düşman)</button>
+            </div>
             <div class="row-grid2 bottom-block">
                 <div class="card">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
@@ -1301,9 +1304,6 @@ input.default-target { width: 72px; margin-left: 6px; }
                     </div>
                     <div class="bottom-list">${enemyList.map(fmtRow).join('')}</div>
                 </div>
-            </div>
-            <div style="text-align:center; margin-top:12px;">
-                <button id="exportListsExcelBtn" style="background:#16a34a; color:#fff; padding:10px 20px; border:none; border-radius:8px; font-weight:700; cursor:pointer;">📊 Excel İndir (Blood + Düşman)</button>
             </div>`;
 
         const copyAlliesBtn = document.getElementById('copyBottomAlliesBtn');
