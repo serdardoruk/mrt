@@ -184,7 +184,7 @@ input.default-target { width: 72px; margin-left: 6px; }
 
 <div class="page">
 <button id="saveStateBtn" class="floating-save">Kaydet</button>
-<div class='update-time'>🕐 31.01.2026 10:33 OT</div>
+<div class='update-time'>🕐 31.01.2026 10:36 OT</div>
 <div class="controls card">
   <div class="fam-labels">
     <div class="fam-label">Blood Aileler <button class="picker-btn" data-side="ally">▾</button></div>
@@ -202,6 +202,10 @@ input.default-target { width: 72px; margin-left: 6px; }
     <div class="rank-item"><span class="rank-label">Blood:</span><select id="allyRankSelect" class="rank-select"></select></div>
     <div class="rank-item"><span class="rank-label">Düşman:</span><select id="enemyRankSelect" class="rank-select"></select></div>
   </div>
+</div>
+<script src='https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js'></script>
+<div class='nav-bar' style='margin-top:12px;'>
+  <a id='exportMatchingExcelBtn' class='nav-btn secondary' href='javascript:void(0)' style='background:#16a34a;color:#fff;'>📊 Excel İndir</a>
 </div>
 <div id="table"></div>
 <div id="bottomLists"></div>
@@ -1413,5 +1417,41 @@ input.default-target { width: 72px; margin-left: 6px; }
         run();
         console.log('[init] Done');
     })();
+
+    // Excel Export for Matching Table
+    function exportMatchingToExcel() {
+        const rows = [];
+        manualAssignments.forEach((shooters, enemyName) => {
+            const enemyRec = playerIndex.get(enemyName) || {};
+            const enemyPos = enemyRec.Pos || '';
+            const enemyFamily = enemyRec.Family || '';
+            const enemyRank = enemyRec.Rank || '';
+            shooters.forEach((shooterName, idx) => {
+                const shooterRec = playerIndex.get(shooterName) || {};
+                rows.push({
+                    'Düşman': enemyName,
+                    'Düşman Pos': Number(enemyPos) || '',
+                    'Düşman Aile': enemyFamily,
+                    'Düşman Rank': enemyRank,
+                    'Sıra': idx + 1,
+                    'Shooter': shooterName,
+                    'Shooter Pos': Number(shooterRec.Pos) || '',
+                    'Shooter Aile': shooterRec.Family || '',
+                    'Shooter Rank': shooterRec.Rank || ''
+                });
+            });
+        });
+        if (rows.length === 0) {
+            alert('Henüz eşleştirme yapılmamış!');
+            return;
+        }
+        rows.sort((a, b) => (a['Düşman Pos'] || 9999) - (b['Düşman Pos'] || 9999) || a['Sıra'] - b['Sıra']);
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, 'Eşleştirmeler');
+        XLSX.writeFile(wb, 'omerta_matching_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
+    const exportMatchingBtn = document.getElementById('exportMatchingExcelBtn');
+    if (exportMatchingBtn) exportMatchingBtn.onclick = exportMatchingToExcel;
     </script>
 </body></html>
