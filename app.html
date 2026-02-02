@@ -177,8 +177,8 @@
 
     <!-- Fixed Footer -->
     <footer class="app-footer">
-        <span class="footer-item update-time" id="updateTime">Last Refresh: --</span>
-        <span class="footer-item current-time" id="currentTime">Now: --:--:-- OT</span>
+        <span class="footer-item current-time" id="currentTime">--:--:-- OT</span>
+        <span class="footer-item update-time" id="updateTime">refreshed --</span>
         <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
     </footer>
 
@@ -243,18 +243,40 @@
             const h = String(now.getUTCHours()).padStart(2, '0');
             const m = String(now.getUTCMinutes()).padStart(2, '0');
             const s = String(now.getUTCSeconds()).padStart(2, '0');
-            el.textContent = 'Now: ' + h + ':' + m + ':' + s + ' OT';
+            el.textContent = h + ':' + m + ':' + s + ' OT';
         }
         
-        // Güncelleme zamanını yükle
+        // Güncelleme zamanını yükle ve "refreshed X ago" olarak göster
+        let refreshedTimestamp = null;
         async function loadUpdateTime() {
             try {
                 const res = await fetch('data/update_time.txt');
                 if (res.ok) {
-                    const time = await res.text();
-                    document.getElementById('updateTime').textContent = 'Last Refresh: ' + time.trim();
+                    const time = (await res.text()).trim();
+                    // Parse: "DD.MM.YYYY HH:MM OT" -> Date
+                    const match = time.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
+                    if (match) {
+                        const [, d, mo, y, h, mi] = match;
+                        refreshedTimestamp = Date.UTC(+y, +mo - 1, +d, +h, +mi);
+                    }
+                    updateRefreshedAgo();
                 }
             } catch(e) {}
+        }
+        function updateRefreshedAgo() {
+            const el = document.getElementById('updateTime');
+            if (!el || !refreshedTimestamp) return;
+            const now = Date.now();
+            const diff = now - refreshedTimestamp;
+            const mins = Math.floor(diff / 60000);
+            const hours = Math.floor(mins / 60);
+            const days = Math.floor(hours / 24);
+            let ago;
+            if (days > 0) ago = days + 'd ago';
+            else if (hours > 0) ago = hours + 'h ago';
+            else if (mins > 0) ago = mins + 'm ago';
+            else ago = 'just now';
+            el.textContent = 'refreshed ' + ago;
         }
         
         // Logout
@@ -270,6 +292,7 @@
         updateCurrentTime();
         loadUpdateTime();
         setInterval(updateCurrentTime, 1000);
+        setInterval(updateRefreshedAgo, 60000);
         handleHash();
     </script>
 </body>
