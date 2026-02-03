@@ -1371,13 +1371,13 @@ input.default-target { width: 72px; margin-left: 6px; }
                 const cityColor = pickCityColor(cityName);
                 const rankHtml = rankBadgeHtml(m.Rank);
                 
-                // Blood: RANK | ŞEHİR | AİLE | İSİM | POS (sağa yasla)
-                // Düşman: POS | İSİM | AİLE | ŞEHİR | RANK (normal)
+                // Blood: ŞEHİR | AİLE | RANK | İSİM | POS (dıştan içe)
+                // Düşman: POS | İSİM | RANK | AİLE | ŞEHİR (içten dışa)
                 if (side === 'blood') {
                     return `<tr>
-                        <td>${rankHtml}</td>
                         <td style="color:${cityColor};font-weight:600;">${cityName}</td>
                         <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
+                        <td>${rankHtml}</td>
                         <td style="text-align:right;">${shieldDot(m)}${nameHtml}</td>
                         <td style="text-align:center;">${posHtml}</td>
                     </tr>`;
@@ -1385,9 +1385,9 @@ input.default-target { width: 72px; margin-left: 6px; }
                     return `<tr>
                         <td style="text-align:center;">${posHtml}</td>
                         <td>${shieldDot(m)}${nameHtml}</td>
+                        <td>${rankHtml}</td>
                         <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
                         <td style="color:${cityColor};font-weight:600;">${cityName}</td>
-                        <td>${rankHtml}</td>
                     </tr>`;
                 }
             }).join('');
@@ -1395,9 +1395,9 @@ input.default-target { width: 72px; margin-left: 6px; }
             if (side === 'blood') {
                 return `<table class="excel-table">
                     <thead><tr>
-                        <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
                         <th data-col="City" data-side="${side}" style="cursor:pointer;width:100px;">Şehir ${sortIcon('City', col, asc)}</th>
                         <th data-col="Family" data-side="${side}" style="cursor:pointer;">Aile ${sortIcon('Family', col, asc)}</th>
+                        <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
                         <th data-col="Name" data-side="${side}" style="cursor:pointer;">İsim ${sortIcon('Name', col, asc)}</th>
                         <th data-col="Pos" data-side="${side}" style="cursor:pointer;width:80px;">Pos ${sortIcon('Pos', col, asc)}</th>
                     </tr></thead>
@@ -1408,9 +1408,9 @@ input.default-target { width: 72px; margin-left: 6px; }
                     <thead><tr>
                         <th data-col="Pos" data-side="${side}" style="cursor:pointer;width:80px;">Pos ${sortIcon('Pos', col, asc)}</th>
                         <th data-col="Name" data-side="${side}" style="cursor:pointer;">İsim ${sortIcon('Name', col, asc)}</th>
+                        <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
                         <th data-col="Family" data-side="${side}" style="cursor:pointer;">Aile ${sortIcon('Family', col, asc)}</th>
                         <th data-col="City" data-side="${side}" style="cursor:pointer;width:100px;">Şehir ${sortIcon('City', col, asc)}</th>
-                        <th data-col="Rank" data-side="${side}" style="cursor:pointer;width:100px;">Rank ${sortIcon('Rank', col, asc)}</th>
                     </tr></thead>
                     <tbody>${rows}</tbody>
                 </table>`;
