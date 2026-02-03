@@ -243,14 +243,15 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function pickCityColor(city) {
         const c = (city || '').toLowerCase();
-        if (c === 'corleone') return '#dc2626'; // kırmızı
-        if (c === 'las vegas') return '#7c3aed'; // mor
-        if (c === 'new york') return '#2563eb'; // mavi
-        if (c === 'chicago') return '#ea580c'; // turuncu
-        if (c === 'detroit') return '#16a34a'; // yeşil
-        if (c === 'baltimore') return '#0891b2'; // cyan
-        if (c === 'philadelphia') return '#ca8a04'; // sarı
-        if (c === 'palermo') return '#db2777'; // pembe
+        // Şehirler için SICAK renkler (turuncu/kahve/kırmızı tonları)
+        if (c === 'corleone') return '#b91c1c'; // koyu kırmızı
+        if (c === 'las vegas') return '#c2410c'; // koyu turuncu
+        if (c === 'new york') return '#a16207'; // koyu sarı
+        if (c === 'chicago') return '#15803d'; // koyu yeşil
+        if (c === 'detroit') return '#0e7490'; // koyu cyan
+        if (c === 'baltimore') return '#1d4ed8'; // koyu mavi
+        if (c === 'philadelphia') return '#7e22ce'; // koyu mor
+        if (c === 'palermo') return '#be185d'; // koyu pembe
         return '#64748b'; // gri
     }
 
@@ -276,8 +277,9 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function getRankTier(rank) {
         const r = (rank || '').toLowerCase();
-        if (r === 'godfather' || r === 'first lady') return { bg: '#7c3aed', text: '#fff', icon: '👑' }; // MOR + taç
-        if (r === 'capodecina') return { bg: '#c4b5fd', text: '#4c1d95', icon: '⭐' }; // AÇIK MOR + yıldız
+        // Ranklar için MAVİ tonları - şehirlerle çakışmaz
+        if (r === 'godfather' || r === 'first lady') return { bg: '#1e3a8a', text: '#fff', icon: '👑' }; // KOYU MAVİ + taç
+        if (r === 'capodecina') return { bg: '#3b82f6', text: '#fff', icon: '⭐' }; // ORTA MAVİ + yıldız
         if (r === 'bruglione') return { bg: '#e2e8f0', text: '#334155', icon: '' }; // GRİ
         return { bg: '#f1f5f9', text: '#64748b', icon: '' }; // AÇIK GRİ
     }
