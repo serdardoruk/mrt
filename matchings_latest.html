@@ -372,13 +372,14 @@ input.default-target { width: 72px; margin-left: 6px; }
     function getPosTier(pos) {
         const n = Number(pos);
         if (isNaN(n) || n <= 0) return { color: '#f3f4f6', tierName: 'none', icon: '' };
-        if (n === 1) return { color: '#7c2d12', tierName: 'legend', icon: '👑' };    // Kral - koyu kahve/altın
-        if (n <= 5) return { color: '#c2410c', tierName: 'top5', icon: '⭐' };        // Yıldız - turuncu
-        if (n <= 20) return { color: '#0369a1', tierName: 'top20', icon: '💎' };     // Elmas - mavi
-        if (n <= 50) return { color: '#0891b2', tierName: 'top50', icon: '🔹' };     // Nokta - cyan
-        if (n <= 100) return { color: '#0d9488', tierName: 'top100', icon: '' };     // Önemli - teal
-        if (n <= 200) return { color: '#9ca3af', tierName: 'top200', icon: '' };     // OK - gri
-        return { color: '#e5e7eb', tierName: 'none', icon: '' };                     // Boş - açık gri
+        // Altın/Sarı tonları - koyu'dan açık'a, belirgin aralıklar
+        if (n === 1) return { color: '#78350f', tierName: 'legend', icon: '👑' };    // Kral - çok koyu kahve
+        if (n <= 5) return { color: '#92400e', tierName: 'top5', icon: '⭐' };        // Yıldız - koyu kahve
+        if (n <= 20) return { color: '#b45309', tierName: 'top20', icon: '💎' };     // Elmas - koyu turuncu
+        if (n <= 50) return { color: '#d97706', tierName: 'top50', icon: '🔹' };     // Nokta - turuncu
+        if (n <= 100) return { color: '#f59e0b', tierName: 'top100', icon: '' };     // Önemli - amber
+        if (n <= 200) return { color: '#fbbf24', tierName: 'top200', icon: '' };     // OK - sarı
+        return { color: '#fef3c7', tierName: 'none', icon: '' };                     // Boş - çok açık sarı
     }
 
     function posBarHtml(pos) {
@@ -386,8 +387,8 @@ input.default-target { width: 72px; margin-left: 6px; }
         if (isNaN(n) || n <= 0) return '';
         const tier = getPosTier(n);
         if (tier.tierName === 'none') return `<span style="color:#9ca3af;font-size:11px;">#${n}</span>`;
-        const isLight = ['top200'].includes(tier.tierName);
-        const textColor = isLight ? '#374151' : '#fff';
+        const isLight = ['top100', 'top200'].includes(tier.tierName);
+        const textColor = isLight ? '#78350f' : '#fff';
         const iconPart = tier.icon ? tier.icon + ' ' : '';
         return `<span style="background:${tier.color};color:${textColor};padding:1px 4px;border-radius:3px;font-weight:700">${iconPart}#${n}</span>`;
     }
