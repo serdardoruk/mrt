@@ -256,22 +256,22 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function pickRankColor(rank) {
         const r = (rank || '').toLowerCase();
-        // Koyu -> Açık gradient - daha belirgin farklar
-        if (r === 'godfather' || r === 'first lady') return '#7c2d12'; // koyu kahve-turuncu
-        if (r === 'bruglione') return '#b91c1c'; // koyu kırmızı
-        if (r === 'capodecina') return '#c2410c'; // turuncu
-        if (r === 'chief') return '#ca8a04'; // sarı
-        if (r === 'local chief') return '#4d7c0f'; // yeşil
-        if (r === 'assassin') return '#0f766e'; // teal
-        if (r === 'swindler') return '#0369a1'; // mavi
-        if (r === 'soldier') return '#1d4ed8'; // koyu mavi
-        if (r === 'mobster') return '#6d28d9'; // mor
-        if (r === 'associate') return '#a21caf'; // pembe-mor
-        if (r === 'thief') return '#be185d'; // pembe
-        if (r === 'pickpocket') return '#9ca3af'; // gri
-        if (r === 'shoplifter') return '#6b7280'; // koyu gri
-        if (r === 'picciotto') return '#4b5563'; // daha koyu gri
-        return '#64748b'; // bilinmeyen
+        // GF/FL en üst - altın/parlak, Capo ikinci, Brug ve altı normal
+        if (r === 'godfather' || r === 'first lady') return '#d97706'; // ALTIN - en üst
+        if (r === 'capodecina') return '#dc2626'; // KIRMIZI - ikinci seviye
+        if (r === 'bruglione') return '#64748b'; // GRİ - düz member
+        if (r === 'chief') return '#64748b';
+        if (r === 'local chief') return '#64748b';
+        if (r === 'assassin') return '#64748b';
+        if (r === 'swindler') return '#64748b';
+        if (r === 'soldier') return '#64748b';
+        if (r === 'mobster') return '#64748b';
+        if (r === 'associate') return '#64748b';
+        if (r === 'thief') return '#64748b';
+        if (r === 'pickpocket') return '#94a3b8';
+        if (r === 'shoplifter') return '#94a3b8';
+        if (r === 'picciotto') return '#94a3b8';
+        return '#94a3b8';
     }
 
     function shieldDot(rec) {
