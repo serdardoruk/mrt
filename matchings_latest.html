@@ -241,6 +241,25 @@ input.default-target { width: 72px; margin-left: 6px; }
         return hashColor(city || 'unknown', cityPalette);
     }
 
+    function pickRankColor(rank) {
+        const r = (rank || '').toLowerCase();
+        if (r === 'godfather' || r === 'first lady') return '#7c3aed'; // mor - en üst
+        if (r === 'bruglione') return '#dc2626'; // kırmızı
+        if (r === 'capodecina') return '#ea580c'; // turuncu
+        if (r === 'chief') return '#d97706'; // amber
+        if (r === 'local chief') return '#ca8a04'; // sarı
+        if (r === 'assassin') return '#65a30d'; // lime
+        if (r === 'swindler') return '#16a34a'; // yeşil
+        if (r === 'soldier') return '#0d9488'; // teal
+        if (r === 'mobster') return '#0891b2'; // cyan
+        if (r === 'associate') return '#0284c7'; // sky
+        if (r === 'thief') return '#2563eb'; // mavi
+        if (r === 'pickpocket') return '#4f46e5'; // indigo
+        if (r === 'shoplifter') return '#7c3aed'; // violet
+        if (r === 'picciotto') return '#9333ea'; // purple
+        return '#64748b'; // gri - bilinmeyen
+    }
+
     function shieldDot(rec) {
         const styleRaw = (rec?.ShieldStyle || '').toString();
         let color = (rec?.ShieldColor || '').toString().trim();
@@ -1318,13 +1337,15 @@ input.default-target { width: 72px; margin-left: 6px; }
                 const nameHtml = href ? `<a href="${href}" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">${m.Name || ''}</a>` : `<span style="font-weight:700;">${m.Name || ''}</span>`;
                 const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
                 const cityName = data.familyCities?.[m.Family] || '';
+                const rankColor = pickRankColor(m.Rank);
                 return `<tr>
                     <td style="text-align:center;">${posHtml}</td>
                     <td>${shieldDot(m)}${nameHtml}</td>
                     <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
                     <td>${cityName}</td>
-                    <td>${m.Rank || ''}</td>
+                    <td style="color:${rankColor};font-weight:600;">${m.Rank || ''}</td>
                 </tr>`;
+            }).join('');
             }).join('');
             return `<table class="excel-table">
                 <thead><tr>
