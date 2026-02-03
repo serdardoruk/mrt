@@ -274,6 +274,21 @@ input.default-target { width: 72px; margin-left: 6px; }
         return '#94a3b8';
     }
 
+    function getRankTier(rank) {
+        const r = (rank || '').toLowerCase();
+        if (r === 'godfather' || r === 'first lady') return { bg: '#7c3aed', text: '#fff', icon: '👑' }; // MOR + taç
+        if (r === 'capodecina') return { bg: '#c4b5fd', text: '#4c1d95', icon: '⭐' }; // AÇIK MOR + yıldız
+        if (r === 'bruglione') return { bg: '#e2e8f0', text: '#334155', icon: '' }; // GRİ
+        return { bg: '#f1f5f9', text: '#64748b', icon: '' }; // AÇIK GRİ
+    }
+
+    function rankBadgeHtml(rank) {
+        if (!rank) return '';
+        const tier = getRankTier(rank);
+        const iconPart = tier.icon ? tier.icon + ' ' : '';
+        return `<span style="background:${tier.bg};color:${tier.text};padding:2px 6px;border-radius:4px;font-weight:600;font-size:12px;">${iconPart}${rank}</span>`;
+    }
+
     function shieldDot(rec) {
         const styleRaw = (rec?.ShieldStyle || '').toString();
         let color = (rec?.ShieldColor || '').toString().trim();
@@ -1352,13 +1367,13 @@ input.default-target { width: 72px; margin-left: 6px; }
                 const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
                 const cityName = data.familyCities?.[m.Family] || '';
                 const cityColor = pickCityColor(cityName);
-                const rankColor = pickRankColor(m.Rank);
+                const rankHtml = rankBadgeHtml(m.Rank);
                 return `<tr>
                     <td style="text-align:center;">${posHtml}</td>
                     <td>${shieldDot(m)}${nameHtml}</td>
                     <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
                     <td style="color:${cityColor};font-weight:600;">${cityName}</td>
-                    <td style="color:${rankColor};font-weight:600;">${m.Rank || ''}</td>
+                    <td>${rankHtml}</td>
                 </tr>`;
             }).join('');
             return `<table class="excel-table">
