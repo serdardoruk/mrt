@@ -241,23 +241,37 @@ input.default-target { width: 72px; margin-left: 6px; }
         return hashColor(city || 'unknown', cityPalette);
     }
 
+    function pickCityColor(city) {
+        const c = (city || '').toLowerCase();
+        if (c === 'corleone') return '#dc2626'; // kırmızı
+        if (c === 'las vegas') return '#7c3aed'; // mor
+        if (c === 'new york') return '#2563eb'; // mavi
+        if (c === 'chicago') return '#ea580c'; // turuncu
+        if (c === 'detroit') return '#16a34a'; // yeşil
+        if (c === 'baltimore') return '#0891b2'; // cyan
+        if (c === 'philadelphia') return '#ca8a04'; // sarı
+        if (c === 'palermo') return '#db2777'; // pembe
+        return '#64748b'; // gri
+    }
+
     function pickRankColor(rank) {
         const r = (rank || '').toLowerCase();
-        if (r === 'godfather' || r === 'first lady') return '#7c3aed'; // mor - en üst
-        if (r === 'bruglione') return '#dc2626'; // kırmızı
-        if (r === 'capodecina') return '#ea580c'; // turuncu
-        if (r === 'chief') return '#d97706'; // amber
-        if (r === 'local chief') return '#ca8a04'; // sarı
-        if (r === 'assassin') return '#65a30d'; // lime
-        if (r === 'swindler') return '#16a34a'; // yeşil
-        if (r === 'soldier') return '#0d9488'; // teal
-        if (r === 'mobster') return '#0891b2'; // cyan
-        if (r === 'associate') return '#0284c7'; // sky
-        if (r === 'thief') return '#2563eb'; // mavi
-        if (r === 'pickpocket') return '#4f46e5'; // indigo
-        if (r === 'shoplifter') return '#7c3aed'; // violet
-        if (r === 'picciotto') return '#9333ea'; // purple
-        return '#64748b'; // gri - bilinmeyen
+        // Koyu -> Açık gradient (GF en koyu, aşağı indikçe açılıyor)
+        if (r === 'godfather' || r === 'first lady') return '#1e1b4b'; // çok koyu mor
+        if (r === 'bruglione') return '#312e81'; // koyu indigo
+        if (r === 'capodecina') return '#3730a3'; // indigo
+        if (r === 'chief') return '#4338ca'; // orta indigo
+        if (r === 'local chief') return '#4f46e5'; // açık indigo
+        if (r === 'assassin') return '#6366f1'; // mor-mavi
+        if (r === 'swindler') return '#818cf8'; // açık mor
+        if (r === 'soldier') return '#a5b4fc'; // çok açık indigo
+        if (r === 'mobster') return '#7c3aed'; // violet
+        if (r === 'associate') return '#8b5cf6'; // açık violet
+        if (r === 'thief') return '#a78bfa'; // daha açık violet
+        if (r === 'pickpocket') return '#c4b5fd'; // çok açık violet
+        if (r === 'shoplifter') return '#ddd6fe'; // en açık violet
+        if (r === 'picciotto') return '#94a3b8'; // gri
+        return '#64748b'; // bilinmeyen
     }
 
     function shieldDot(rec) {
@@ -1337,12 +1351,13 @@ input.default-target { width: 72px; margin-left: 6px; }
                 const nameHtml = href ? `<a href="${href}" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">${m.Name || ''}</a>` : `<span style="font-weight:700;">${m.Name || ''}</span>`;
                 const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
                 const cityName = data.familyCities?.[m.Family] || '';
+                const cityColor = pickCityColor(cityName);
                 const rankColor = pickRankColor(m.Rank);
                 return `<tr>
                     <td style="text-align:center;">${posHtml}</td>
                     <td>${shieldDot(m)}${nameHtml}</td>
                     <td style="color:${famColor};font-weight:600;">${m.Family || ''}</td>
-                    <td>${cityName}</td>
+                    <td style="color:${cityColor};font-weight:600;">${cityName}</td>
                     <td style="color:${rankColor};font-weight:600;">${m.Rank || ''}</td>
                 </tr>`;
             }).join('');
