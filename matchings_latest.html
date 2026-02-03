@@ -256,21 +256,21 @@ input.default-target { width: 72px; margin-left: 6px; }
 
     function pickRankColor(rank) {
         const r = (rank || '').toLowerCase();
-        // Koyu -> Açık gradient (GF en koyu, aşağı indikçe açılıyor)
-        if (r === 'godfather' || r === 'first lady') return '#1e1b4b'; // çok koyu mor
-        if (r === 'bruglione') return '#312e81'; // koyu indigo
-        if (r === 'capodecina') return '#3730a3'; // indigo
-        if (r === 'chief') return '#4338ca'; // orta indigo
-        if (r === 'local chief') return '#4f46e5'; // açık indigo
-        if (r === 'assassin') return '#6366f1'; // mor-mavi
-        if (r === 'swindler') return '#818cf8'; // açık mor
-        if (r === 'soldier') return '#a5b4fc'; // çok açık indigo
-        if (r === 'mobster') return '#7c3aed'; // violet
-        if (r === 'associate') return '#8b5cf6'; // açık violet
-        if (r === 'thief') return '#a78bfa'; // daha açık violet
-        if (r === 'pickpocket') return '#c4b5fd'; // çok açık violet
-        if (r === 'shoplifter') return '#ddd6fe'; // en açık violet
-        if (r === 'picciotto') return '#94a3b8'; // gri
+        // Koyu -> Açık gradient - daha belirgin farklar
+        if (r === 'godfather' || r === 'first lady') return '#7c2d12'; // koyu kahve-turuncu
+        if (r === 'bruglione') return '#b91c1c'; // koyu kırmızı
+        if (r === 'capodecina') return '#c2410c'; // turuncu
+        if (r === 'chief') return '#ca8a04'; // sarı
+        if (r === 'local chief') return '#4d7c0f'; // yeşil
+        if (r === 'assassin') return '#0f766e'; // teal
+        if (r === 'swindler') return '#0369a1'; // mavi
+        if (r === 'soldier') return '#1d4ed8'; // koyu mavi
+        if (r === 'mobster') return '#6d28d9'; // mor
+        if (r === 'associate') return '#a21caf'; // pembe-mor
+        if (r === 'thief') return '#be185d'; // pembe
+        if (r === 'pickpocket') return '#9ca3af'; // gri
+        if (r === 'shoplifter') return '#6b7280'; // koyu gri
+        if (r === 'picciotto') return '#4b5563'; // daha koyu gri
         return '#64748b'; // bilinmeyen
     }
 
