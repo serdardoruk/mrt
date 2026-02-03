@@ -241,18 +241,33 @@ input.default-target { width: 72px; margin-left: 6px; }
         return hashColor(city || 'unknown', cityPalette);
     }
 
-    function pickCityColor(city) {
+    function pickCityColor(city, side) {
         const c = (city || '').toLowerCase();
-        // Şehirler için SICAK renkler (turuncu/kahve/kırmızı tonları)
-        if (c === 'corleone') return '#b91c1c'; // koyu kırmızı
-        if (c === 'las vegas') return '#c2410c'; // koyu turuncu
-        if (c === 'new york') return '#a16207'; // koyu sarı
-        if (c === 'chicago') return '#15803d'; // koyu yeşil
-        if (c === 'detroit') return '#0e7490'; // koyu cyan
-        if (c === 'baltimore') return '#1d4ed8'; // koyu mavi
-        if (c === 'philadelphia') return '#7e22ce'; // koyu mor
-        if (c === 'palermo') return '#be185d'; // koyu pembe
-        return '#64748b'; // gri
+        // Blood: Yeşil tonları (farklı yeşiller)
+        // Düşman: Kırmızı tonları (farklı kırmızılar)
+        if (side === 'enemy') {
+            // Kırmızı tonları - şehirler için
+            if (c === 'corleone') return '#991b1b';
+            if (c === 'las vegas') return '#b91c1c';
+            if (c === 'new york') return '#dc2626';
+            if (c === 'chicago') return '#ef4444';
+            if (c === 'detroit') return '#f87171';
+            if (c === 'baltimore') return '#fca5a5';
+            if (c === 'philadelphia') return '#7f1d1d';
+            if (c === 'palermo') return '#450a0a';
+            return '#fecaca';
+        } else {
+            // Yeşil tonları - şehirler için
+            if (c === 'corleone') return '#14532d';
+            if (c === 'las vegas') return '#166534';
+            if (c === 'new york') return '#15803d';
+            if (c === 'chicago') return '#16a34a';
+            if (c === 'detroit') return '#22c55e';
+            if (c === 'baltimore') return '#4ade80';
+            if (c === 'philadelphia') return '#052e16';
+            if (c === 'palermo') return '#064e3b';
+            return '#86efac';
+        }
     }
 
     function pickRankColor(rank) {
@@ -1368,7 +1383,7 @@ input.default-target { width: 72px; margin-left: 6px; }
                 const nameHtml = href ? `<a href="${href}" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">${m.Name || ''}</a>` : `<span style="font-weight:700;">${m.Name || ''}</span>`;
                 const famColor = m.Family ? pickFamColor(m.Family, side === 'blood' ? 'ally' : 'enemy') : '';
                 const cityName = data.familyCities?.[m.Family] || '';
-                const cityColor = pickCityColor(cityName);
+                const cityColor = pickCityColor(cityName, side === 'blood' ? 'ally' : 'enemy');
                 const rankHtml = rankBadgeHtml(m.Rank);
                 
                 // Blood: ŞEHİR | AİLE | RANK | İSİM | POS (dıştan içe)
